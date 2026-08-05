@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- Form View Section -->
+    <record
+            id="product_brand_gcsextended_product_template_only_form_view"
+            model="ir.ui.view">
+        <field name="name">product.brand.gcs.extended.product.template.only.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id"
+               ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <field name="categ_id" position="after">
+                <field name="product_brand_gcs" options="{'no_create': True, 'no_create_edit': True, 'no_edit': True}"/>
+            </field>
+            <field name="barcode" position="after">
+                        <field name="product_pesaje" string="Producto de Pesaje?"/>
+                        <field name="lf_code" invisible="product_pesaje==False"/>
+                        <field name="pbarcode" invisible="product_pesaje==False" string="barcode (prefijo del codigo de barra en la balanza)"/>
+                        
+                        <field name="weight_unit" invisible="product_pesaje==False"/>
+                        <field name="deptment" invisible="product_pesaje==False"/>
+                        <field name="tare" invisible="product_pesaje==False"/>
+                        <field name="shelf_time" invisible="product_pesaje==False"/>
+                        <field name="fix_unit" invisible="product_pesaje==False"/>
+                        <field name="fix_weight" invisible="product_pesaje==False"/>
+                        <field name="tolerance" invisible="product_pesaje==False"/>
+                        <field name="message1" invisible="product_pesaje==False"/>
+                        <field name="message2" invisible="product_pesaje==False"/>
+                        <field name="account" invisible="product_pesaje==False"/>
+                        <field name="multilabel" invisible="product_pesaje==False"/>
+                    
+            </field>
+        </field>
+    </record>
+</odoo>
+

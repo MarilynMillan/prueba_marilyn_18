@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+user_access_product_brand_gcs,user_access_product_brand_gcs,model_product_brand_gcs,base.group_user,1,0,0,0
+manager_access_product_brand_gcs,manager_access_product_brand_gcs,model_product_brand_gcs,base.group_system,1,1,1,1
+wizard_report_balanza,wizard.report.balanza,model_wizard_report_balanza,base.group_user,1,1,1,1

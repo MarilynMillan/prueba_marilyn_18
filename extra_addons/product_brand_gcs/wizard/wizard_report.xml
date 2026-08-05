@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+    	<record id="wizard_report_comisiones" model="ir.ui.view">
+       	    <field name="name">Archivo para Balanzas</field>
+            <field name="model">wizard.report.balanza</field>
+    	    <field name="arch" type="xml">
+    	    	<form string="Archivo para Balanza">
+                    <group>
+                       
+                        <!--field name="date_from" string="Fecha Inicio" required="1"/>
+                        <field name="date_to"  string="Fecha Fin" required="1"/-->
+                        <field invisible="1" name="state"/>
+                        <field name="name"  invisible="1"/>
+                        <field name="report" filename="name" string="Archivo Excel" invisible="state=='choose'"/>
+                    </group>
+                    <footer >
+                        
+                        <button name="print_txp" string="Generar en .TXP" type="object" class="oe_highlight" />
+                        <button name="generate_xls" string="Generar Excel" type="object" class="btn-primary" />
+                        <button special="cancel" string="Cancel" class="oe_highlight" />
+
+                    </footer>
+                    
+                </form>
+    	    </field>
+    	</record>
+        <record id="action_wizard_comision_vendedor" model="ir.actions.act_window">
+        	<field name="name">Reporte Comisiones</field>
+        	<field name="res_model">wizard.report.balanza</field>
+        	<field name="view_mode">form</field>
+        	<field name="view_id" ref="wizard_report_comisiones"/>
+            <!--field name="type">ir.actions.act_window</field-->
+        	<field name="target">new</field>
+    	</record>
+
+		<menuitem 
+            id="menu_report_balanza" 
+            name="Archivo para balanza" 
+            parent="sale.prod_config_main"  
+            action="action_wizard_comision_vendedor" 
+            sequence="1"
+            />
+
+</data>
+</odoo>

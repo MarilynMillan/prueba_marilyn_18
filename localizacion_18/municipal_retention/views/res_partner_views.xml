@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="municipality_tax_view" model="ir.ui.view">
+        <field name="name">municipality.tax.view</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page string="Retenciones Municipales">
+                    <group string="Agente retenedor Municipal" name="muni_wh_agent">
+                        <field name="muni_wh_agent" string="Agente de retención"/>
+                    </group>
+                    
+                    
+
+                    <group string="Retención de impuestos municipales" invisible="muni_wh_agent==False">
+                        
+                       <separator string="Purchase" name="purchase_vat_retetion" invisible="1"/>
+                        <!--field name="purchase_jrl_id" invisible="1"/-->
+                        <field name="diario_jrl_id" string="Diario de Retención"/>
+                        
+                        <!--separator string="'Withholding accounts receivable" /-->
+                        <field name="account_ret_muni_receivable_id"/>
+                        
+                        <!--separator string="Sale" name="sale_vat_retention" invisible="1"/-->
+                        <field name="sale_jrl_id" invisible="1"/>
+                        
+                        <!--separator string="Account Withholding to pay (Suppliers)"/-->
+                        <field name="account_ret_muni_payable_id"/>
+
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//div[@class='o_address_format']" position="replace">
+                <div class="o_address_format">
+                    <field name="street" placeholder="Street..." class="o_address_street" readonly="type=='contact' and parent_id!=False"/>
+                    <field name="street2" placeholder="Street 2..." class="o_address_street" readonly="type=='contact' and parent_id!=False"/>
+                    <field name="city" placeholder="City" class="o_address_city" readonly="type=='contact' and parent_id!=False" required="partner_type=='national'"/>
+                    <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" readonly="type=='contact' and parent_id!=False" required="partner_type=='national'"/>
+                    <field name="zip" placeholder="ZIP" class="o_address_zip" required="partner_type=='national'"/>
+                    <field name="municipality_id" 
+                    placeholder="Municipality" 
+                    options='{"no_open": True}' 
+                    domain="[('state_id','=',state_id)]" required="partner_type=='national'"
+                    />
+                    <field name="parish_id" 
+                    placeholder="Parish" 
+                    options='{"no_open": True}' 
+                    domain="[('municipality_id','=',municipality_id)]" required="partner_type=='national'"
+                    />
+                    <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" />
+                </div>
+            </xpath>
+            
+        </field>
+    </record>
+            
+
+
+
+</odoo>

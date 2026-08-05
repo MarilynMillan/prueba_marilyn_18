@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+   <record id="account_move_inerhit_print" model="ir.ui.view">
+            <field name="name">account.move.inerhit.print</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_post']" position="before">
+                    <button name="print_fiscal" string="Imprimir Fiscal" class="oe_highlight" type="object" invisible="move_type=='entry' or state=='draft' or move_type=='out_refund'"/>
+                    <button name="credito_fiscal" string="Imprimir NC Fiscal" class="oe_highlight" type="object" invisible="move_type=='entry' or state=='draft' or move_type=='out_invoice'"/>
+                </xpath>  
+            </field>
+        </record>
+</odoo>

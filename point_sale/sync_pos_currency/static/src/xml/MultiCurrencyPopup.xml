@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="sync_pos_currency.MultiCurrencyPopup" owl="1">
+        <Dialog bodyClass="'currency-selection overflow-y-auto'">
+            <t t-set-slot="header">
+                Multi Currency Payment
+            </t>
+            <table class="table table-borderless">
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%;">Select Currency: </td>
+                        <td style="width: 40%;">
+                            <select class="oe_currency_selection" aria-label="currency-select" t-on-change="onCurrencyChange">
+                                <option t-foreach="state.values" t-as="currency" t-key="currency.id" t-att-value="currency.id">
+                                    <t t-esc="currency.name + ' (' + currency.symbol + ')'"/>
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%;">Payment Method: </td>
+                        <td style="width: 40%;">
+                            <select class="payment-method-select" aria-label=".form-select-payment payment_method_currency">
+                                <option t-foreach="props.payment_method" t-as="value" t-key="value.id" t-att-value="value.id">
+                                    <t t-set="selection_option" t-value="value.name"/>
+                                    <span t-esc="selection_option" style="font-size:15px;font-weight: 500"/>
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%;">Unit Per <t t-esc="state.default_currency.name"/>
+                            : </td>
+                        <td style="width: 40%;">
+                            <span id="currency_rate" style="margin-left: 10px;">
+                                <t t-esc="state.inverse_rate"/>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%;"> <t t-esc="state.default_currency.name"/>
+                            Per Unit : </td>
+                        <td style="width: 40%;">
+                            <span id="currency_rate" style="margin-left: 10px;">
+                                <t t-esc="state.selected_rate"/>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%;">Amount to be paid in (<t t-esc="state.symbol"/>): </td>
+                        <td style="width: 40%;">
+                            <span id="currency_rate" style="margin-left: 10px;">
+                                <t t-esc="state.amount_total_currency"/>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; width: 20%;">Enter Amount: </td>
+                        <td style="width: 40%;">
+                            <input class="form-control form-control-sm pay_amount" type="number" placeholder="Enter Amount"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <t t-set-slot="footer">
+                <div class="d-flex justify-content-start flex-wrap gap-2 w-100">
+                    <button class="btn btn-secondary btn-lg lh-lg o-default-button"
+                            t-on-click="cancel">
+                        Discard
+                    </button>
+                    <button class="btn btn-primary btn-lg lh-lg"
+                            t-on-click="confirm">
+                        Confirm
+                    </button>
+                </div>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

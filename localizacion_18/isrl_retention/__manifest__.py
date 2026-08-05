@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+
+{
+        'name': 'ISLR Retencion para  Venezuela odoo v18',
+        'version': '0.1',
+        'author': 'Darrell Sojo/ Frank service',
+        'summary': 'Retenciones ISLR Odoo v18',
+        'description': """This model do the retention about taxes in Venezuela.""",
+        'category': 'Accounting/Accounting',
+        'website': '',
+        'images': [],
+        'depends': [
+            'account',
+            'account_accountant',
+            'base',
+            'product',
+            'base_contable',
+            'iva_retention',
+            ],
+        'data': [
+            'security/ir.model.access.csv',
+            'security2/ir.model.access.csv',
+            'views/islr_concept_views.xml',
+            #'data/islr_concept_data.xml',
+            #'data/islr_retention_rate.xml',
+            'data/vat_retention_data.xml',
+            'views/partner_views.xml',
+            'views/account_move_views.xml',
+            ######'views/menu_vat_retention.xml',
+            'views/retention_vat_views.xml',
+            'wizards/xml_views.xml',
+            'wizards/arc.xml',
+            'report/vat_isrl_voucher.xml',
+            'report/report_arc.xml',
+            ],
+        'installable': True,
+        'application': True,
+        'auto_install': False,
+                      
+}

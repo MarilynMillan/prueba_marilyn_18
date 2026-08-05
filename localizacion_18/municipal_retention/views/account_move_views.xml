@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  
+    <record id="acc_move_muni_tax_view_form" model="ir.ui.view">
+        <field name="name">account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='operation_type']" position="after">
+                <field name="wh_muni_id" invisible="move_type=='entry'" />        
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list//field[@name='tax_ids']" position="before">
+                <field name="concept_id" string="Retención Municipal"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list//field[@name='tax_ids']" position="before">
+                <field name="concept_id" string="Retención Municipal" invisible="1"/>
+            </xpath>
+            
+        </field>
+    </record>
+
+    
+
+</odoo>

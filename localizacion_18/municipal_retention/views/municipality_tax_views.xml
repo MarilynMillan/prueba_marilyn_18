@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="municipality_tax_view_form" model="ir.ui.view">
+        <field name="name">municipality.tax.view.form</field>
+        <field name="model">municipality.tax</field>
+        <field name="arch" type="xml">
+            <form string="Municipality Tax">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_post" type="object" string="Confirmar" class="oe_highlight" invisible="state=='posted'"/>
+                    <button name="comprobante" type="object" string="Imprimir Comprobante" class="oe_highlight" invisible="state=='draft' or move_type in ('out_invoice','out_refund','out_receipt')"/>
+                     <button name="action_draft" type="object" string="Ir a Borrador" class="oe_highlight" invisible="state!='posted'"/>
+                </header>
+                <sheet>
+                   <div class="oe_title">
+                        <span class="o_form_label" style="font-weight:bold;">Número de Comprobante</span>
+                        <h1>
+                            <field name="name" readonly="move_type in ('in_invoice','in_refund','in_receipt')"/>
+                            <!--field name="name" readonly="move_type in ('in_invoice','in_refund','in_receipt')" /-->
+                        </h1>
+                    </div>
+                    <group  readonly="state=='posted'">
+                        <group name="1">
+                            <field name="partner_id" readonly="state=='posted'" string="Proveedor/Cliente"/>
+                            <field name="transaction_date" readonly="state=='posted'" string="Fecha Transacción"/>
+                            <field name="id" invisible="True"/>
+                            <field name="move_type" invisible="1" string="Tipo de documento" readonly="state=='posted'"/>
+                            <field name="invoice_id" readonly="state=='posted'" string="Documento" domain="[('move_type', 'in',('out_invoice','in_invoice','in_refund','out_refund','in_receipt','out_receipt'))]"/>
+                        </group>
+                        <group name="2">
+                            <field name="city" invisible="0" readonly="state=='posted'" string="Ciudad"/>
+                            <field name="state_id" invisible="0" readonly="state=='posted'" string="Estado"/>
+                            <field name="municipality_id" invisible="0" readonly="state=='posted'" string="Municipio"/>
+                            <field name="company_id" readonly="1" string="Compañia"/>
+                            <field name="asiento_ret_id" readonly="state=='posted'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group readonly="state=='posted'">
+                            <field name="rif" readonly="state=='posted'"/>
+                            <field name="address" readonly="state=='posted'"/>
+                            
+                        </group>
+                        <group>
+                            
+                            <div class="o_row">
+                                <span class="o_form_label" style="font-weight:bold;">Periódo Fiscal</span>
+                                <field name="date_start" readonly="state=='posted'" options="{'no_open':True, 'no_create':True}"/>
+                                <field name="date_end" readonly="state=='posted'" options="{'no_open':True, 'no_create':True}"/>
+                            </div>
+                        </group>
+                    </group>
+                    <field name="act_code_ids" nolabel="1" readonly="state=='posted'">
+                        <list editable="bottom">
+                            <field name="invoice_id" column_invisible="0" string="Doc"/>
+                            <field name="invoice_number" column_invisible="0" string="Nro Factura"/>
+                            <field name="invoice_ctrl_number" column_invisible="0" string="Nro Control"/>
+                            <field name="municipality_tax_id" column_invisible="1"/>
+                            <field name="code" column_invisible="0" string="Código de Actividad"/>
+                            <field name="concept_id" string="Concepto de retención"/>
+                            <field name="base_tax" string="Base Imponible"/>
+                            <field name="aliquot" string="Aliquota"/>
+                            <field name="wh_amount" string="Importe de Retención"/>
+                            <field name="move_typee" column_invisible="1"/>
+                        </list>
+                    </field>
+                    <group class="oe_right">
+                        <group class="oe_subtotal_footer">
+                            <field name="withheld_amount" string="Base Retención"/>
+                            <field name="amount" class="oe_subtotal_footer_separator" string="Monto retenido"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="municipality_tax_view_tree" model="ir.ui.view">
+        <field name="name">municipality.tax.view.tree</field>
+        <field name="model">municipality.tax</field>
+        <field name="arch" type="xml">
+            <list string="Impuesto Municipal">
+                <field name="name" string="Nro Comprobante"/>
+                <!--field name="invoice_number" string="Número de Factura"/-->
+                <field name="invoice_id" string="Documento"/>
+                <field name="move_type" string="Tipo"/>
+                <!--field name="rif"/-->
+                <field name="partner_id" string="Clie./Provee."/>
+                <field name="withheld_amount" string="Importe" sum="withheld_amount"/>
+                <field name="amount" string="Importe Retenido" sum="amount"/>
+                <field name="transaction_date" string="Fecha Transacción"/>
+                
+            </list>
+        </field>
+    </record>
+    
+
+    <record id="action_municipality_tax_suppliers" model="ir.actions.act_window">
+        <field name="name">Impuesto Municipal para Proveedores</field>
+        <field name="res_model">municipality.tax</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type','=','in_invoice')]</field>
+        <field name="context">{'move_type':'in_invoice'}</field>
+    </record>
+
+    <record id="action_municipality_tax_customer" model="ir.actions.act_window">
+        <field name="name">Impuesto Municipal para Clientes</field>
+        <field name="res_model">municipality.tax</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type','=','out_invoice')]</field>
+        <field name="context">{'move_type':'out_invoice'}</field>
+    </record>
+    
+    <!-- Menu for all supplier retention -->
+    <menuitem 
+        id="menu_municipality_tax_suppliers"
+        name="Retención Municipal Proveedores"
+        action="action_municipality_tax_suppliers"
+        parent="account.menu_finance_payables"
+        sequence="27"
+    />
+
+    <!-- Menu for all customer retention -->
+    <menuitem 
+        id="menu_municipality_tax_customers"
+        name="Retención Municipal Clientes"
+        action="action_municipality_tax_customer"
+        parent="account.menu_finance_receivables"
+        sequence="27"
+    />
+
+
+
+    <record id="municipality_line_tax_view_form" model="ir.ui.view">
+        <field name="name">muni.wh.concept.view.form</field>
+        <field name="model">muni.wh.concept</field>
+        <field name="arch" type="xml">
+            <form string="Concepto de retención municipal">
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                    </group>
+                    <group>    
+                        <field name="aliquot"/>
+                        <field name="month_ucim"/>
+                        <field name="year_ucim"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="municipality_line_tax_view_tree" model="ir.ui.view">
+        <field name="name">muni.wh.concept.view.tree</field>
+        <field name="model">muni.wh.concept</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="aliquot"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record id="action_municipality_line_tax_concepts" model="ir.actions.act_window">
+        <field name="name">Conceptos de Aplicación de Impuestos Municipales</field>
+        <field name="res_model">muni.wh.concept</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem 
+        id="menu_municipal" 
+        name="Retenciones Municipales"
+        parent="account.menu_finance_configuration" 
+        sequence="55"
+    />
+
+    <menuitem 
+        id="menu_municipality_tax_concepts"
+        name="Conceptos de Aplicación de Impuestos Municipales"
+        action="action_municipality_line_tax_concepts"
+        parent="menu_municipal"
+    />
+
+
+    <record id="municipality_tax_line_view_form" model="ir.ui.view">
+        <field name="name">municipality.tax.line.view.form</field>
+        <field name="model">municipality.tax.line</field>
+        <field name="arch" type="xml">
+            <form string="Línea de impuestos municipales">
+                <sheet>
+                    <group col="4">
+                        <field name="code"/>
+                        <field name="invoice_id"/>
+                        <field name="invoice_date"/>
+                        <field name="invoice_number"/>
+                        <field name="invoice_ctrl_number"/>
+                        <field name="concept_id"/>
+                        <field name="aliquot"/>
+                        <field name="base_tax"/>
+                        <field name="wh_amount"/>
+                        <field name="move_typee"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="municipality_tax_line_view_tree" model="ir.ui.view">
+        <field name="name">municipality.tax.line.view.tree</field>
+        <field name="model">municipality.tax.line</field>
+        <field name="arch" type="xml">
+            <list string="Línea de impuestos municipales">
+                <field name="code"/>
+                <field name="concept_id"/>
+                <field name="base_tax"/>
+                <field name="aliquot"/>
+                <field name="wh_amount"/>
+                <field name="move_typee"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record id="period_month_view_tree" model="ir.ui.view">
+        <field name="name">period.month.view.tree</field>
+        <field name="model">period.month</field>
+        <field name="arch" type="xml">
+            <list string="Months">
+                <field name="name"/>
+                <field name="months_number"/>
+            </list>
+        </field>
+    </record>
+    
+
+    <record id="period_year_view_tree" model="ir.ui.view">
+        <field name="name">period.year.view.tree</field>
+        <field name="model">period.year</field>
+        <field name="arch" type="xml">
+            <list string="Years">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+
+</odoo>
+
