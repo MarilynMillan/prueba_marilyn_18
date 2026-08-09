@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_report_view_tree_inherit_tasa" model="ir.ui.view">
+        <field name="name">sale.report.view.tree.inherit.tasa</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.sale_report_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_total']" position="after">
+                <field name="tasa_dia"  optional="show"/>
+                <field name="price_total_usd" string="Importe Total USD" optional="show" widget="float"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
