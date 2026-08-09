@@ -30,12 +30,8 @@
 
     # Views
     'data': [
-        #"security/ir.model.access.csv",
-        #"views/product_brand_views.xml",
-        "views/sale_report_views.xml",
-        #"wizard/wizard_report.xml",
-        # 'view/'
-        # wizard/
+       
+        "views/sale_report_view.xml",
     ],
 
     # Application Main Image    
