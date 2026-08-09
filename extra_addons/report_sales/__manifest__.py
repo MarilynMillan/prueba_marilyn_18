@@ -39,7 +39,7 @@
     ],
 
     # Application Main Image    
-    'images': ['static/description/print.png'],
+    #'images': ['static/description/print.png'],
 
     # Technical
     'installable': True,
