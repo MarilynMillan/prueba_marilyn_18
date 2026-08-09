@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="sale_report_view_tree_inherit_tasa" model="ir.ui.view">
-        <field name="name">sale.report.view.tree.inherit.tasa</field>
-        <field name="model">sale.report</field>
+    <record id="pos_order_view_tree_inherit_tasa" model="ir.ui.view">
+        <field name="name">pos.order.view.tree.inherit.tasa</field>
+        <field name="model">pos.order</field>
         <field name="inherit_id" ref="sale.sale_report_view_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='price_total']" position="after">
