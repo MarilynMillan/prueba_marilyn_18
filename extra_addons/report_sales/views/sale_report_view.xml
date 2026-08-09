@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="sale.sale_report_view_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='price_total']" position="after">
-                <!--field name="tasa_dia"  optional="show"/-->
-                <field name="price_total_usd" string="Importe Total USD" optional="show" widget="float"/>
+                <!--field name="tasa_dia"  optional="show"/>
+                <field name="price_total_usd" string="Importe Total USD" optional="show" widget="float"/-->
             </xpath>
         </field>
     </record>
