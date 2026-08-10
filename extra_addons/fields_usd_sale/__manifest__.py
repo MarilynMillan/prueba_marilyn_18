@@ -14,13 +14,13 @@
 #################################################################################
 {
     # Application Information
-    'name': 'Report_sales',
+    'name': 'Fields_usd_sale',
     'version': '18.0',
     'category': 'Sale',
     'license': 'LGPL-3',
     'summary': """Reporte de  ventas y punto de venta""",
     # Author Information
-    'author': 'Ing.Marilyn Millan/Ing Darrell Sojo',
+    'author': 'Ing Darrell Sojo/Colaborador:Ing Marilyn Millan',
     'website': '',
 
     # Application Price Information
