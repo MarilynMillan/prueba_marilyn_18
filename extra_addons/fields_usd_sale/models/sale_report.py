@@ -24,6 +24,8 @@ class SaleReport(models.Model):
             s.x_tasa"""
         return group_by
 
+
+
     def _select_pos(self):
         select_ = super()._select_pos()
         select_ += """,
@@ -37,4 +39,5 @@ class SaleReport(models.Model):
         group_by = super()._group_by_pos()
         group_by += """,
             pos.tasa_dia"""
-        return group_by
+        return group_by 
+
