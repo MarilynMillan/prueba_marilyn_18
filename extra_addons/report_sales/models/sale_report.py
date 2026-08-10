@@ -5,7 +5,7 @@ class SaleReport(models.Model):
 
     tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
     price_total_usd = fields.Float(string="Total USD", readonly=True)
-    price_unit_usd = fields.Float(string="Precio Unitario USD", readonly=True)
+    price_unit_usd = fields.Float(string="Precio unitario USD", readonly=True)
     currency_usd_id = fields.Many2one('res.currency', string="USD Currency", readonly=True)
 
     def _select_sale(self):
@@ -13,9 +13,8 @@ class SaleReport(models.Model):
         select_ += """,
             s.x_tasa as tasa,
             (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
-            SUM(l.price_total / NULLIF(s.tasa, 0)) as price_total_usd,
-            SUM(l.price_unit / NULLIF(s.tasa, 0)) as price_unit_usd"""
-            
+            SUM(l.price_total / NULLIF(s.x_tasa, 0)) as price_total_usd,
+            SUM(l.price_unit / NULLIF(s.x_tasa, 0)) as price_unit_usd"""
         return select_
 
 
@@ -30,8 +29,8 @@ class SaleReport(models.Model):
         select_ += """,
             pos.tasa_dia as tasa,
             (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
-            SUM(l.price_subtotal_incl / NULLIF(pos.tasa_dia, 0)) as price_total_usd,
-            SUM(l.price_unit / NULLIF(pos.tasa_dia, 0)) as price_unit_usd"""
+            SUM(l.price_subtotal_incl / NULLIF(pos.tasa_dia, 0)) as price_total_usd
+            SUM(l.price_unit_incl / NULLIF(pos.tasa_dia, 0)) as price_unit_usd"""
         return select_
 
     def _group_by_pos(self):
