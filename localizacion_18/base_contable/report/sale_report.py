@@ -14,8 +14,8 @@ class SaleReport(models.Model):
         select_ += """,
             s.x_tasa as x_tasa,
             (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
-            SUM(l.price_total / NULLIF(s.x_tasa, 0)) as price_total_usd,
-            SUM(l.price_unit / NULLIF(s.x_tasa, 0)) as price_unit_usd"""
+            TRUNC(SUM(l.price_total / NULLIF(s.x_tasa, 0))::numeric, 2) as price_total_usd,
+            TRUNC(SUM(l.price_unit / NULLIF(s.x_tasa, 0))::numeric, 2) as price_unit_usd"""
         return select_
 
     def _group_by_sale(self):
@@ -33,8 +33,8 @@ class SaleReport(models.Model):
         select_ += """,
             pos.tasa_dia as x_tasa,
             (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
-            SUM(l.price_subtotal_incl / NULLIF(pos.tasa_dia, 0)) as price_total_usd,
-            SUM(l.price_unit / NULLIF(pos.tasa_dia, 0)) as price_unit_usd"""
+            TRUNC(SUM(l.price_subtotal_incl / NULLIF(pos.tasa_dia, 0))::numeric, 2) as price_total_usd,
+            TRUNC(SUM(l.price_unit / NULLIF(pos.tasa_dia, 0))::numeric, 2) as price_unit_usd"""
         return select_
 
     def _group_by_pos(self):
