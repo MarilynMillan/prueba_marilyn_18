@@ -7,7 +7,7 @@ class PosOrder(models.Model):
     price_total_usd = fields.Float(string="Total USD", readonly=True)
     tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
 
-   def _select_sale(self):
+    def _select_sale(self):
         select_ = super()._select_sale()
         select_ += """,
             s.tasa as tasa,
