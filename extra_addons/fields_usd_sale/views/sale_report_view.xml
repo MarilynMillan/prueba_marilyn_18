@@ -8,8 +8,8 @@
             <xpath expr="//field[@name='price_total']" position="after">
                 <field name="tasa" string="Tasa Día" optional="show"/>
                 <field name="currency_usd_id" column_invisible="True"/>
-                <field name="price_unit_usd" string="Precio Unitario USD" optional="show" widget="monetary" options="{'currency_field': 'currency_usd_id'}"/>
-                <field name="price_total_usd" string="Total USD" optional="show" widget="monetary" options="{'currency_field': 'currency_usd_id'}"/>
+                <field name="price_unit_usd" string="Precio Unitario USD" optional="show" options="{'currency_field': 'currency_usd_id'}"/>
+                <field name="price_total_usd" string="Total USD" optional="show"  options="{'currency_field': 'currency_usd_id'}"/>
             </xpath>
         </field>
     </record>
