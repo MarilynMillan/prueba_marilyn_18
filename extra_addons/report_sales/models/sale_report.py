@@ -9,14 +9,14 @@ class SaleReport(models.Model):
     def _select_sale(self):
         select_ = super()._select_sale()
         select_ += """,
-            s.tasa as tasa,
-            SUM(l.price_total / NULLIF(s.tasa, 0)) as price_total_usd"""
+            s.x_tasa as tasa,
+            SUM(l.price_total / NULLIF(s.x_tasa, 0)) as price_total_usd"""
         return select_
 
     def _group_by_sale(self):
         group_by = super()._group_by_sale()
         group_by += """,
-            s.tasa"""
+            s.x_tasa"""
         return group_by
 
     def _select_pos(self):
