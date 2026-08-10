@@ -3,7 +3,7 @@ from odoo import models, fields
 class SaleReport(models.Model):
     _inherit = "sale.report"
 
-    x_tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
+    tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
 
     currency_usd_id = fields.Many2one('res.currency', string="USD Currency", readonly=True)
     price_total_usd = fields.Float(string="Total USD", readonly=True)
@@ -12,7 +12,7 @@ class SaleReport(models.Model):
     def _select_sale(self):
         select_ = super()._select_sale()
         select_ += """,
-            s.x_tasa as x_tasa,
+            s.x_tasa as tasa,
             (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
             TRUNC(SUM(l.price_total / NULLIF(s.x_tasa, 0))::numeric, 2) as price_total_usd,
             TRUNC(SUM(l.price_unit / NULLIF(s.x_tasa, 0))::numeric, 2) as price_unit_usd"""
@@ -31,7 +31,7 @@ class SaleReport(models.Model):
         # However, we know pos_sale is installed based on the DB state described by the user.
         select_ = super()._select_pos()
         select_ += """,
-            pos.tasa_dia as x_tasa,
+            pos.tasa_dia as tasa,
             (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
             TRUNC(SUM(l.price_subtotal_incl / NULLIF(pos.tasa_dia, 0))::numeric, 2) as price_total_usd,
             TRUNC(SUM(l.price_unit / NULLIF(pos.tasa_dia, 0))::numeric, 2) as price_unit_usd"""
