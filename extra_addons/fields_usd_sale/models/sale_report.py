@@ -10,22 +10,23 @@ class SaleReport(models.Model):
 
     def _select_sale(self):
         select_ = super()._select_sale()
+        # Se añaden exactamente 4 columnas
         select_ += """,
-            s.x_tasa as tasa,
+            s.tasa as tasa,
             (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
-            TRUNC(CAST(SUM(l.price_total / NULLIF(s.x_tasa, 0)) AS numeric), 2) as price_total_usd,
-            TRUNC(CAST(SUM(l.price_unit / NULLIF(s.x_tasa, 0)) AS numeric), 2) as price_unit_usd"""
+            TRUNC(CAST(SUM(l.price_total / NULLIF(s.tasa, 0)) AS numeric), 2) as price_total_usd,
+            TRUNC(CAST(SUM(l.price_unit / NULLIF(s.tasa, 0)) AS numeric), 2) as price_unit_usd"""
         return select_
-
 
     def _group_by_sale(self):
         group_by = super()._group_by_sale()
         group_by += """,
-            s.x_tasa"""
+            s.tasa"""
         return group_by
 
     def _select_pos(self):
         select_ = super()._select_pos()
+        # Se añaden exactamente las mismas 4 columnas con los mismos alias
         select_ += """,
             pos.tasa_dia as tasa,
             (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
