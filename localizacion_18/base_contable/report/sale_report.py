@@ -4,12 +4,15 @@ class SaleReport(models.Model):
     _inherit = "sale.report"
 
     x_tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
+
+    currency_usd_id = fields.Many2one('res.currency', string="USD Currency", readonly=True)
     price_total_usd = fields.Float(string="Total USD", readonly=True)
 
     def _select_sale(self):
         select_ = super()._select_sale()
         select_ += """,
             s.x_tasa as x_tasa,
+            (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
             SUM(l.price_total / NULLIF(s.x_tasa, 0)) as price_total_usd"""
         return select_
 
@@ -27,6 +30,7 @@ class SaleReport(models.Model):
         select_ = super()._select_pos()
         select_ += """,
             pos.tasa_dia as x_tasa,
+            (SELECT id FROM res_currency WHERE name = 'USD' LIMIT 1) as currency_usd_id,
             SUM(l.price_subtotal_incl / NULLIF(pos.tasa_dia, 0)) as price_total_usd"""
         return select_
 

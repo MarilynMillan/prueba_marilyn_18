@@ -7,7 +7,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='price_total']" position="after">
                 <field name="x_tasa" string="Tasa Dia" optional="show"/>
-                <field name="price_total_usd" string="Importe Total USD" optional="show" widget="float"/>
+                <field name="currency_usd_id" column_invisible="True"/>
+                <field name="price_total_usd" string="Importe Total USD" optional="show" widget="monetary" options="{'currency_field': 'currency_usd_id'}"/>
             </xpath>
         </field>
     </record>
