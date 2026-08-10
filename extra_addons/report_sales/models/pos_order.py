@@ -1,8 +1,38 @@
 from odoo import models, fields
 
-class PosOrder(models.Model):
-    _inherit = "pos.order"
+class SaleReport(models.Model):
+    _inherit = "sale.report"
 
+    x_tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
     price_total_usd = fields.Float(string="Total USD", readonly=True)
 
-   
+    def _select_sale(self):
+        select_ = super()._select_sale()
+        select_ += """,
+            s.x_tasa as x_tasa,
+            SUM(l.price_total / NULLIF(s.x_tasa, 0)) as price_total_usd"""
+        return select_
+
+    def _group_by_sale(self):
+        group_by = super()._group_by_sale()
+        group_by += """,
+            s.x_tasa"""
+        return group_by
+
+    def _select_pos(self):
+        # We need to make sure pos_sale is installed or available in this context. 
+        # But we can safely override it if the method exists in super.
+        # If pos_sale is not installed, this method will fail unless we conditionally do it.
+        # However, we know pos_sale is installed based on the DB state described by the user.
+        select_ = super()._select_pos()
+        select_ += """,
+            pos.tasa_dia as x_tasa,
+            SUM(l.price_subtotal_incl / NULLIF(pos.tasa_dia, 0)) as price_total_usd"""
+        return select_
+
+    def _group_by_pos(self):
+        group_by = super()._group_by_pos()
+        group_by += """,
+            pos.tasa_dia"""
+        return group_by
+        
