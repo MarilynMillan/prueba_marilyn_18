@@ -1,12 +1,13 @@
 from odoo import models, fields
 
-class SaleReport(models.Model):
-    _inherit = "sale.report"
+class PosOrder(models.Model):
+    _inherit = "pos.order"
 
-    tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
+
     price_total_usd = fields.Float(string="Total USD", readonly=True)
+    tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
 
-    def _select_sale(self):
+   def _select_sale(self):
         select_ = super()._select_sale()
         select_ += """,
             s.tasa as tasa,
@@ -35,4 +36,3 @@ class SaleReport(models.Model):
         group_by += """,
             pos.tasa_dia"""
         return group_by
-        
