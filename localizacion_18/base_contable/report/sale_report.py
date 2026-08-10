@@ -18,3 +18,20 @@ class SaleReport(models.Model):
         group_by += """,
             s.x_tasa"""
         return group_by
+
+    def _select_pos(self):
+        # We need to make sure pos_sale is installed or available in this context.
+        # But we can safely override it if the method exists in super.
+        # If pos_sale is not installed, this method will fail unless we conditionally do it.
+        # However, we know pos_sale is installed based on the DB state described by the user.
+        select_ = super()._select_pos()
+        select_ += """,
+            pos.tasa_dia as x_tasa,
+            SUM(l.price_subtotal_incl / NULLIF(pos.tasa_dia, 0)) as price_total_usd"""
+        return select_
+
+    def _group_by_pos(self):
+        group_by = super()._group_by_pos()
+        group_by += """,
+            pos.tasa_dia"""
+        return group_by
