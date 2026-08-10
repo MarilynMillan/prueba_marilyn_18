@@ -22,6 +22,9 @@
         'sale',
         'purchase',
         'stock_account',
+        'point_of_sale',
+        'pos_receipt_extend',
+        'pos_sale',
         ],
 
     # always loaded
