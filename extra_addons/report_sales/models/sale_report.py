@@ -1,11 +1,10 @@
 from odoo import models, fields
 
-class PosOrder(models.Model):
-    _inherit = "pos.order"
+class SaleReport(models.Model):
+    _inherit = "sale.report"
 
-
-    price_total_usd = fields.Float(string="Total USD", readonly=True)
     tasa = fields.Float(string="Tasa del día", group_operator="avg", readonly=True)
+    price_total_usd = fields.Float(string="Total USD", readonly=True)
 
     def _select_sale(self):
         select_ = super()._select_sale()

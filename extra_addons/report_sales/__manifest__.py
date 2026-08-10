@@ -26,7 +26,7 @@
     # Application Price Information
 
     # Dependencies
-    'depends': ['base', 'sale','point_of_sale', 'pos_receipt_extend', 'pos_receipt_extend'],
+    'depends': ['base', 'sale','point_of_sale', 'pos_receipt_extend'],
 
     # Views
     'data': [
