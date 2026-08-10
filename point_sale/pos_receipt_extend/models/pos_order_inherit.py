@@ -19,7 +19,7 @@ class PosConfig(models.Model):
     nro_fact_seniat = fields.Char()
     status_impresora = fields.Char(default="no")
     tipo = fields.Char(default="venta")
-    tasa_dia = fields.Float(compute="_compute_tasa", store=True)
+    tasa_dia = fields.Float(compute="_compute_tasa")
 
     url_nota_credito=fields.Char(string="Imprimir Nota de Credito",readonly="True")
     id_order_afectado=fields.Char()
