@@ -74,4 +74,10 @@ class SaleOrder(models.Model):
                 result=lista.inverse_company_rate
             selff.x_tasa=result
 
-   
+
+class PosOrder(models.Model):
+    _inherit = 'pos.order'
+
+    # Redeclaring to add store=True so it exists in the database table
+    # for the sale.report SQL view
+    tasa_dia = fields.Float(store=True)

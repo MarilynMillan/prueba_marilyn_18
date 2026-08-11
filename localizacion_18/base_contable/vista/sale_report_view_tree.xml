@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_report_view_tree_inherit_tasa" model="ir.ui.view">
+        <field name="name">sale.report.view.tree.inherit.tasa</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.sale_report_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_total']" position="after">
+                <field name="tasa" string="Tasa Dia" optional="show"/>
+                <field name="currency_usd_id" column_invisible="True"/>
+                <field name="price_unit_usd" string="Precio Unitario USD" optional="show" widget="monetary" options="{'currency_field': 'currency_usd_id'}"/>
+                <field name="price_total_usd" string="Importe Total USD" optional="show" widget="monetary" options="{'currency_field': 'currency_usd_id'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

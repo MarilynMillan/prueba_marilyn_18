@@ -22,6 +22,9 @@
         'sale',
         'purchase',
         'stock_account',
+        'point_of_sale',
+        'pos_receipt_extend',
+        'pos_sale',
         ],
 
     # always loaded
@@ -37,6 +40,7 @@
         'vista/account_paiment_register_view.xml',
         'vista/purchase_inherit.xml',
         'vista/sale_inherit.xml',
+        'vista/sale_report_view_tree.xml',
         'vista/stock_valuation_layer_base.xml',
         'wizar_report_igtf/wizard.xml',
         'wizar_report_igtf/reporte_view.xml',
