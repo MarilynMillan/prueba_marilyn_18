@@ -30,8 +30,14 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         else:
             tasa_promedio = 1.0
 
-        products_data = {}
+        pos_products_data = {}
+        sale_products_data = {}
         payments_data = {}
+
+        total_pos_bs = 0.0
+        total_pos_usd = 0.0
+        total_sale_bs = 0.0
+        total_sale_usd = 0.0
 
         # --- POS Orders ---
         pos_orders = self.env['pos.order'].search([
@@ -45,10 +51,10 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                 categ_name = line.product_id.categ_id.name or 'Sin Categoría'
                 product_name = line.product_id.name
 
-                if categ_name not in products_data:
-                    products_data[categ_name] = {}
-                if product_name not in products_data[categ_name]:
-                    products_data[categ_name][product_name] = {
+                if categ_name not in pos_products_data:
+                    pos_products_data[categ_name] = {}
+                if product_name not in pos_products_data[categ_name]:
+                    pos_products_data[categ_name][product_name] = {
                         'product_name': product_name,
                         'quantity': 0.0,
                         'uom': line.product_id.uom_id.name,
@@ -56,9 +62,14 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                         'price_total_usd': 0.0
                     }
 
-                products_data[categ_name][product_name]['quantity'] += line.qty
-                products_data[categ_name][product_name]['price_total'] += line.price_subtotal_incl
-                products_data[categ_name][product_name]['price_total_usd'] += (line.price_subtotal_incl / tasa_promedio) if tasa_promedio else 0.0
+                amount_usd = (line.price_subtotal_incl / tasa_promedio) if tasa_promedio else 0.0
+
+                pos_products_data[categ_name][product_name]['quantity'] += line.qty
+                pos_products_data[categ_name][product_name]['price_total'] += line.price_subtotal_incl
+                pos_products_data[categ_name][product_name]['price_total_usd'] += amount_usd
+
+                total_pos_bs += line.price_subtotal_incl
+                total_pos_usd += amount_usd
 
             for payment in order.payment_ids:
                 payment_name = payment.payment_method_id.name
@@ -83,10 +94,10 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     categ_name = line.product_id.categ_id.name or 'Sin Categoría'
                     product_name = line.product_id.name
 
-                    if categ_name not in products_data:
-                        products_data[categ_name] = {}
-                    if product_name not in products_data[categ_name]:
-                        products_data[categ_name][product_name] = {
+                    if categ_name not in sale_products_data:
+                        sale_products_data[categ_name] = {}
+                    if product_name not in sale_products_data[categ_name]:
+                        sale_products_data[categ_name][product_name] = {
                             'product_name': product_name,
                             'quantity': 0.0,
                             'uom': line.product_uom.name,
@@ -95,10 +106,14 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                         }
 
                     price_company_curr = order.currency_id._convert(line.price_total, company.currency_id, company, order.date_order)
+                    amount_usd = (price_company_curr / tasa_promedio) if tasa_promedio else 0.0
 
-                    products_data[categ_name][product_name]['quantity'] += line.product_uom_qty
-                    products_data[categ_name][product_name]['price_total'] += price_company_curr
-                    products_data[categ_name][product_name]['price_total_usd'] += (price_company_curr / tasa_promedio) if tasa_promedio else 0.0
+                    sale_products_data[categ_name][product_name]['quantity'] += line.product_uom_qty
+                    sale_products_data[categ_name][product_name]['price_total'] += price_company_curr
+                    sale_products_data[categ_name][product_name]['price_total_usd'] += amount_usd
+
+                    total_sale_bs += price_company_curr
+                    total_sale_usd += amount_usd
 
             # Find related payments via invoices
             for invoice in order.invoice_ids.filtered(lambda inv: inv.state == 'posted' and inv.payment_state in ('in_payment', 'paid')):
@@ -110,8 +125,6 @@ class ReportGlobalSalesDetails(models.AbstractModel):
 
                     payment_name = payment.journal_id.name or 'Pago (Ventas)'
 
-                    # We should technically use the partial amount reconciled with this invoice
-                    # But if we track by payment_id we just take the total payment amount once per order
                     amount_company_curr = payment.currency_id._convert(payment.amount, company.currency_id, company, payment.date)
 
                     if payment_name not in payments_data:
@@ -121,9 +134,16 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     payments_data[payment_name]['total_usd'] += (amount_company_curr / tasa_promedio) if tasa_promedio else 0.0
 
         # Format products list
-        formatted_products = []
-        for categ, prods in products_data.items():
-            formatted_products.append({
+        formatted_pos_products = []
+        for categ, prods in pos_products_data.items():
+            formatted_pos_products.append({
+                'name': categ,
+                'products': list(prods.values())
+            })
+
+        formatted_sale_products = []
+        for categ, prods in sale_products_data.items():
+            formatted_sale_products.append({
                 'name': categ,
                 'products': list(prods.values())
             })
@@ -135,7 +155,14 @@ class ReportGlobalSalesDetails(models.AbstractModel):
             'date_stop': end_date_str,
             'company': company,
             'currency_usd_obj': currency_usd_obj,
-            'products': formatted_products,
+            'pos_products': formatted_pos_products,
+            'sale_products': formatted_sale_products,
             'payments': formatted_payments,
-            'tasa_promedio': tasa_promedio
+            'tasa_promedio': tasa_promedio,
+            'total_pos_bs': total_pos_bs,
+            'total_pos_usd': total_pos_usd,
+            'total_sale_bs': total_sale_bs,
+            'total_sale_usd': total_sale_usd,
+            'total_general_bs': total_pos_bs + total_sale_bs,
+            'total_general_usd': total_pos_usd + total_sale_usd,
         }
