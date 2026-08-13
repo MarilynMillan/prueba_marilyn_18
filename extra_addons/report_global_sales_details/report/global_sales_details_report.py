@@ -3,7 +3,7 @@ from odoo.exceptions import UserError
 import pytz
 
 class ReportGlobalSalesDetails(models.AbstractModel):
-    _name = 'report.global.sales.details'
+    _name = 'report.report_global_sales_details.report_template'
     _description = 'Reporte Global de Detalles de Ventas'
 
     @api.model
