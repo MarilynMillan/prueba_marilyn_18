@@ -86,10 +86,14 @@ class ReportGlobalSalesDetails(models.AbstractModel):
             ('date_order', '<=', end_date_str),
             ('state', 'in', ['sale', 'done'])
         ])
-
+        
         processed_payment_ids = set()
-
         for order in sale_orders:
+            
+            # NUEVO: Extraer la tasa directamente de la orden de venta. 
+            # Se usa un fallback a tasa_promedio o 1.0 por si alguna orden antigua no tiene el campo x_tasa lleno.
+            tasa_orden = order.x_tasa if order.x_tasa and order.x_tasa > 0 else tasa_promedio
+            
             for line in order.order_line:
                 if not line.display_type:
                     categ_name = line.product_id.categ_id.name or 'Sin Categoría'
@@ -106,18 +110,17 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                             'price_total_usd': 0.0
                         }
                     
-                    # CORRECCION: Ajuste segun la moneda de la orden
+                    # CORRECCIÓN: Usar 'tasa_orden' en lugar de 'tasa_promedio' para los cálculos
                     if order.currency_id == currency_usd_obj:
                         amount_usd = line.price_total
-                        # Convertimos a Bs multiplicando por la tasa
-                        amount_bs = amount_usd * tasa_promedio
+                        amount_bs = amount_usd * tasa_orden
                     elif order.currency_id == company.currency_id:
                         amount_bs = line.price_total
-                        amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
+                        amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
                     else:
                         # Si es otra moneda rara, convertimos a Bs y luego calculamos a USD
                         amount_bs = order.currency_id._convert(line.price_total, company.currency_id, company, order.date_order)
-                        amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
+                        amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
                     
                     sale_products_data[categ_name][product_name]['quantity'] += line.product_uom_qty
                     sale_products_data[categ_name][product_name]['price_total'] += amount_bs
@@ -126,6 +129,7 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     total_sale_bs += amount_bs
                     total_sale_usd += amount_usd
 
+            # CORRECCIÓN PARA PAGOS: También debes ajustar el ciclo de pagos asociado a esta orden para que cuadre
             for invoice in order.invoice_ids.filtered(lambda inv: inv.state == 'posted' and inv.payment_state in ('in_payment', 'paid')):
                 for payment in invoice._get_reconciled_payments():
                     if payment.id in processed_payment_ids:
@@ -134,15 +138,16 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     
                     payment_name = payment.journal_id.name or 'Pago (Ventas)'
                     
+                    # Usamos 'tasa_orden' para que el pago refleje la misma tasa que la venta
                     if payment.currency_id == currency_usd_obj:
                         amount_usd = payment.amount
-                        amount_bs = amount_usd * tasa_promedio
+                        amount_bs = amount_usd * tasa_orden
                     elif payment.currency_id == company.currency_id:
                         amount_bs = payment.amount
-                        amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
+                        amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
                     else:
                         amount_bs = payment.currency_id._convert(payment.amount, company.currency_id, company, payment.date)
-                        amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
+                        amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
                     
                     if payment_name not in payments_data:
                         payments_data[payment_name] = {'name': payment_name, 'total': 0.0, 'total_usd': 0.0}
