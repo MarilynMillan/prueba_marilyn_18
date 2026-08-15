@@ -47,7 +47,6 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         ])
 
         for order in pos_orders:
-            # En POS la moneda suele ser la base de la compañía, o order.currency_id
             for line in order.lines:
                 categ_name = line.product_id.categ_id.name or 'Sin Categoría'
                 product_name = line.product_id.name
@@ -63,14 +62,13 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                         'price_total_usd': 0.0
                     }
                 
-                amount_bs = line.price_subtotal_incl
-                amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
+                amount_usd = (line.price_subtotal_incl / tasa_promedio) if tasa_promedio else 0.0
                 
                 pos_products_data[categ_name][product_name]['quantity'] += line.qty
-                pos_products_data[categ_name][product_name]['price_total'] += amount_bs
+                pos_products_data[categ_name][product_name]['price_total'] += line.price_subtotal_incl
                 pos_products_data[categ_name][product_name]['price_total_usd'] += amount_usd
                 
-                total_pos_bs += amount_bs
+                total_pos_bs += line.price_subtotal_incl
                 total_pos_usd += amount_usd
 
             for payment in order.payment_ids:
@@ -87,11 +85,12 @@ class ReportGlobalSalesDetails(models.AbstractModel):
             ('state', 'in', ['sale', 'done'])
         ])
 
+        # Track processed payments globally to avoid double counting across multiple invoices/orders
         processed_payment_ids = set()
 
         for order in sale_orders:
             for line in order.order_line:
-                if not line.display_type:
+                if not line.display_type:  # Ignore sections and notes
                     categ_name = line.product_id.categ_id.name or 'Sin Categoría'
                     product_name = line.product_id.name
                     
@@ -106,27 +105,19 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                             'price_total_usd': 0.0
                         }
                     
-                    # CORRECCION: Ajuste segun la moneda de la orden
-                    if order.currency_id == currency_usd_obj:
-                        amount_usd = line.price_total
-                        # Convertimos a Bs multiplicando por la tasa
-                        amount_bs = amount_usd * tasa_promedio
-                    elif order.currency_id == company.currency_id:
-                        amount_bs = line.price_total
-                        amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
-                    else:
-                        # Si es otra moneda rara, convertimos a Bs y luego calculamos a USD
-                        amount_bs = order.currency_id._convert(line.price_total, company.currency_id, company, order.date_order)
-                        amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
+                    price_company_curr = order.currency_id._convert(line.price_total, company.currency_id, company, order.date_order)
+                    amount_usd = (price_company_curr / tasa_promedio) if tasa_promedio else 0.0
                     
                     sale_products_data[categ_name][product_name]['quantity'] += line.product_uom_qty
-                    sale_products_data[categ_name][product_name]['price_total'] += amount_bs
+                    sale_products_data[categ_name][product_name]['price_total'] += price_company_curr
                     sale_products_data[categ_name][product_name]['price_total_usd'] += amount_usd
                     
-                    total_sale_bs += amount_bs
+                    total_sale_bs += price_company_curr
                     total_sale_usd += amount_usd
 
+            # Find related payments via invoices
             for invoice in order.invoice_ids.filtered(lambda inv: inv.state == 'posted' and inv.payment_state in ('in_payment', 'paid')):
+                # In Odoo, _get_reconciled_payments() returns account.payment records
                 for payment in invoice._get_reconciled_payments():
                     if payment.id in processed_payment_ids:
                         continue
@@ -134,49 +125,27 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     
                     payment_name = payment.journal_id.name or 'Pago (Ventas)'
                     
-                    if payment.currency_id == currency_usd_obj:
-                        amount_usd = payment.amount
-                        amount_bs = amount_usd * tasa_promedio
-                    elif payment.currency_id == company.currency_id:
-                        amount_bs = payment.amount
-                        amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
-                    else:
-                        amount_bs = payment.currency_id._convert(payment.amount, company.currency_id, company, payment.date)
-                        amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
+                    amount_company_curr = payment.currency_id._convert(payment.amount, company.currency_id, company, payment.date)
                     
                     if payment_name not in payments_data:
                         payments_data[payment_name] = {'name': payment_name, 'total': 0.0, 'total_usd': 0.0}
                     
-                    payments_data[payment_name]['total'] += amount_bs
-                    payments_data[payment_name]['total_usd'] += amount_usd
+                    payments_data[payment_name]['total'] += amount_company_curr
+                    payments_data[payment_name]['total_usd'] += (amount_company_curr / tasa_promedio) if tasa_promedio else 0.0
                 
-        # Format products list WITH subtotals
+        # Format products list
         formatted_pos_products = []
         for categ, prods in pos_products_data.items():
-            cat_qty = sum(p['quantity'] for p in prods.values())
-            cat_bs = sum(p['price_total'] for p in prods.values())
-            cat_usd = sum(p['price_total_usd'] for p in prods.values())
-            
             formatted_pos_products.append({
                 'name': categ,
-                'products': list(prods.values()),
-                'subtotal_qty': cat_qty,
-                'subtotal_bs': cat_bs,
-                'subtotal_usd': cat_usd,
+                'products': list(prods.values())
             })
             
         formatted_sale_products = []
         for categ, prods in sale_products_data.items():
-            cat_qty = sum(p['quantity'] for p in prods.values())
-            cat_bs = sum(p['price_total'] for p in prods.values())
-            cat_usd = sum(p['price_total_usd'] for p in prods.values())
-            
             formatted_sale_products.append({
                 'name': categ,
-                'products': list(prods.values()),
-                'subtotal_qty': cat_qty,
-                'subtotal_bs': cat_bs,
-                'subtotal_usd': cat_usd,
+                'products': list(prods.values())
             })
             
         formatted_payments = list(payments_data.values())

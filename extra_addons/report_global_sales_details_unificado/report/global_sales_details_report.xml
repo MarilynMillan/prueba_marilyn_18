@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_global_sales" model="ir.actions.report">
+        <field name="name">Detalle Global de Ventas</field>
+        <field name="model">global.sales.details.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_global_sales_details.report_template</field>
+        <field name="report_file">report_global_sales_details.report_template</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <template id="report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="text-center">
+                        <h2>Detalles de ventas Globales</h2>
+                        <strong><t t-esc="date_start" t-options="{'widget': 'datetime'}"/> - <t t-esc="date_stop" t-options="{'widget': 'datetime'}"/></strong>
+                    </div>
+
+                    <br/>
+                    
+                    <h3>Ventas</h3>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Total Bs</th>
+                                <th class="text-end">Total USD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="products" t-as="category">
+                                <tr>
+                                    <td colspan="4">
+                                        <strong><t t-esc="category['name']"/></strong>
+                                    </td>
+                                </tr>
+                                <t t-foreach="category['products']" t-as="line">
+                                    <tr>
+                                        <td style="padding-left: 20px;"><t t-esc="line['product_name']"/></td>
+                                        <td class="text-end"><t t-esc="line['quantity']"/> <t t-esc="line['uom']"/></td>
+                                        <td class="text-end"><t t-esc="line['price_total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                        <td class="text-end"><t t-esc="line['price_total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <br/>
+
+                    <h3>Pagos</h3>
+                    <table class="table table-sm" style="width: 50%;">
+                        <tbody>
+                            <t t-foreach="payments" t-as="payment">
+                                <tr>
+                                    <td><t t-esc="payment['name']"/></td>
+                                    <td class="text-end"><t t-esc="payment['total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                    <td class="text-end"><t t-esc="payment['total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
