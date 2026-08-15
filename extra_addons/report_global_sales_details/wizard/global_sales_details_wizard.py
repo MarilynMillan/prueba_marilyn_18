@@ -9,7 +9,7 @@ class GlobalSalesDetailsWizard(models.TransientModel):
 
     def generate_report(self):
         data = {
-            'start_date': fields.Datetime.to_string(self.start_date),
-            'end_date': fields.Datetime.to_string(self.end_date),
+            'start_date': fields.Date.to_string(self.start_date),
+            'end_date': fields.Date.to_string(self.end_date),
         }
         return self.env.ref('report_global_sales_details.action_report_global_sales').report_action([], data=data)
