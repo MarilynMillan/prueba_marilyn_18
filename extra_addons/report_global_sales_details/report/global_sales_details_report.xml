@@ -15,7 +15,7 @@
                 <div class="page">
                     <div class="text-center">
                         <h2>Detalles de ventas Globales</h2>
-                        <strong><t t-esc="date_start" t-options="{'widget': 'datetime'}"/> - <t t-esc="date_stop" t-options="{'widget': 'datetime'}"/></strong>
+                        <strong><t t-esc="date_start" t-options="{'widget': 'date'}"/> - <t t-esc="date_stop" t-options="{'widget': 'date'}"/></strong>
                     </div>
 
                     <br/>

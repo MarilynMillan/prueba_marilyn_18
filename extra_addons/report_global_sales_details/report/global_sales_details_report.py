@@ -54,8 +54,8 @@ class ReportGlobalSalesDetails(models.AbstractModel):
 
         # --- POS Orders ---
         pos_orders = self.env['pos.order'].search([
-            ('date_order', '>=', start_date_str),
-            ('date_order', '<=', end_date_str),
+            ('date_order', '>=', search_start), # SE CORRIGIÓ: Usar search_start para abarcar el día completo
+            ('date_order', '<=', search_end),   # SE CORRIGIÓ: Usar search_end
             ('state', 'in', ['paid', 'done', 'invoiced'])
         ])
 
@@ -95,8 +95,8 @@ class ReportGlobalSalesDetails(models.AbstractModel):
 
         # --- Sale Orders ---
         sale_orders = self.env['sale.order'].search([
-            ('date_order', '>=', start_date_str),
-            ('date_order', '<=', end_date_str),
+            ('date_order', '>=', search_start),
+            ('date_order', '<=', search_end),
             ('state', 'in', ['sale', 'done']),
             ('invoice_status', '=', 'invoiced')
         ])
@@ -104,10 +104,24 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         processed_payment_ids = set()
         for order in sale_orders:
             
-            # NUEVO: Extraer la tasa directamente de la orden de venta. 
-            # Se usa un fallback a tasa_promedio o 1.0 por si alguna orden antigua no tiene el campo x_tasa lleno.
+            # Extraer la tasa directamente de la orden de venta
             tasa_orden = order.x_tasa if order.x_tasa and order.x_tasa > 0 else tasa_promedio
             
+            # Validar la lista de precios de la orden
+            is_usd_pricelist = order.pricelist_id.currency_id == currency_usd_obj
+            
+            # CALCULAR EL TOTAL GENERAL USANDO LA CABECERA (order.amount_total)
+            if is_usd_pricelist:
+                order_usd = order.amount_total
+                order_bs = order_usd * tasa_orden
+            else:
+                order_bs = order.amount_total
+                order_usd = (order_bs / tasa_orden) if tasa_orden else 0.0
+                
+            total_sale_bs += order_bs
+            total_sale_usd += order_usd
+            
+            # CICLO DE LÍNEAS (Solo para agrupar los datos en el PDF)
             for line in order.order_line:
                 if not line.display_type:
                     categ_name = line.product_id.categ_id.name or 'Sin Categoría'
@@ -124,26 +138,18 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                             'price_total_usd': 0.0
                         }
                     
-                    # CORRECCIÓN: Usar 'tasa_orden' en lugar de 'tasa_promedio' para los cálculos
-                    if order.currency_id == currency_usd_obj:
+                    if is_usd_pricelist:
                         amount_usd = line.price_total
                         amount_bs = amount_usd * tasa_orden
-                    elif order.currency_id == company.currency_id:
-                        amount_bs = line.price_total
-                        amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
                     else:
-                        # Si es otra moneda rara, convertimos a Bs y luego calculamos a USD
-                        amount_bs = order.currency_id._convert(line.price_total, company.currency_id, company, order.date_order)
+                        amount_bs = line.price_total
                         amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
                     
                     sale_products_data[categ_name][product_name]['quantity'] += line.product_uom_qty
                     sale_products_data[categ_name][product_name]['price_total'] += amount_bs
                     sale_products_data[categ_name][product_name]['price_total_usd'] += amount_usd
-                    
-                    total_sale_bs += amount_bs
-                    total_sale_usd += amount_usd
 
-            # CORRECCIÓN PARA PAGOS: También debes ajustar el ciclo de pagos asociado a esta orden para que cuadre
+            # CICLO DE PAGOS (Se mantiene intacto, usando la tasa de la orden)
             for invoice in order.invoice_ids.filtered(lambda inv: inv.state == 'posted' and inv.payment_state in ('in_payment', 'paid')):
                 for payment in invoice._get_reconciled_payments():
                     if payment.id in processed_payment_ids:
@@ -152,7 +158,6 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     
                     payment_name = payment.journal_id.name or 'Pago (Ventas)'
                     
-                    # Usamos 'tasa_orden' para que el pago refleje la misma tasa que la venta
                     if payment.currency_id == currency_usd_obj:
                         amount_usd = payment.amount
                         amount_bs = amount_usd * tasa_orden
