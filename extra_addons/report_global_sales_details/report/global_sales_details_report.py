@@ -13,15 +13,15 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         end_date_str = data.get('end_date')
         
         # 1. Convertimos el string a objeto Date
-        start_d = fields.Date.from_string(start_date_str)
-        end_d = fields.Date.from_string(end_date_str)
+        start_date = fields.Date.from_string(start_date_str)
+        end_date = fields.Date.from_string(end_date_str)
         
         # 2. Tomamos la zona horaria (America/Caracas)
         user_tz = pytz.timezone(self.env.user.tz or 'America/Caracas')
         
         # 3. Forzamos 00:00:00 para el inicio y 23:59:59 para el fin, convirtiendo a UTC (hora de la BD de Odoo)
-        start_dt_utc = user_tz.localize(datetime.combine(start_d, time.min)).astimezone(pytz.utc).replace(tzinfo=None)
-        end_dt_utc = user_tz.localize(datetime.combine(end_d, time.max)).astimezone(pytz.utc).replace(tzinfo=None)
+        start_dt_utc = user_tz.localize(datetime.combine(start_date, time.min)).astimezone(pytz.utc).replace(tzinfo=None)
+        end_dt_utc = user_tz.localize(datetime.combine(end_date, time.max)).astimezone(pytz.utc).replace(tzinfo=None)
         
         # 4. Convertimos a string para usarlo en el .search()
         search_start = fields.Datetime.to_string(start_dt_utc)
