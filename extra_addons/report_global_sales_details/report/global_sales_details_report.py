@@ -98,32 +98,29 @@ class ReportGlobalSalesDetails(models.AbstractModel):
             ('date_order', '>=', search_start),
             ('date_order', '<=', search_end),
             ('state', 'in', ['sale', 'done']),
-            ('invoice_status', '=', 'invoiced') # Filtro para coincidir con "Facturado por completo"
+            ('invoice_status', '=', 'invoiced')
         ])
-
-        # =========================================================================
-        # 1. CÁLCULO DIRECTO DEL TOTAL GENERAL (Sumando amount_total)
-        # =========================================================================
+        
+        # 1. CÁLCULO DIRECTO DEL TOTAL GENERAL (Solo Cabeceras)
+        # Reiniciamos las variables aquí para asegurar que no traigan basura
+        total_sale_bs = 0.0
+        total_sale_usd = 0.0
+        
         for order in sale_orders:
             tasa_orden = order.x_tasa if order.x_tasa and order.x_tasa > 0 else tasa_promedio
             
-            # Validación por Lista de Precios (La regla correcta)
-            is_usd_pricelist = order.pricelist_id.currency_id == currency_usd_obj
-            
-            if is_usd_pricelist:
+            if order.currency_id == currency_usd_obj:
                 total_sale_usd += order.amount_total
                 total_sale_bs += order.amount_total * tasa_orden
             else:
                 total_sale_bs += order.amount_total
                 total_sale_usd += (order.amount_total / tasa_orden) if tasa_orden else 0.0
 
-        # =========================================================================
-        # 2. DESGLOSE DE PRODUCTOS (Solo para imprimir en el PDF)
-        # =========================================================================
+        # 2. DESGLOSE DE PRODUCTOS (Para la tabla del PDF)
+        # ESTE CICLO YA NO SUMA NADA A LOS TOTALES GENERALES
         processed_payment_ids = set()
         for order in sale_orders:
             tasa_orden = order.x_tasa if order.x_tasa and order.x_tasa > 0 else tasa_promedio
-            is_usd_pricelist = order.pricelist_id.currency_id == currency_usd_obj
             
             for line in order.order_line:
                 if not line.display_type:
@@ -141,7 +138,8 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                             'price_total_usd': 0.0
                         }
                     
-                    if is_usd_pricelist:
+                    # Cálculo para la línea
+                    if order.currency_id == currency_usd_obj:
                         amount_usd = line.price_total
                         amount_bs = amount_usd * tasa_orden
                     else:
@@ -151,10 +149,9 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     sale_products_data[categ_name][product_name]['quantity'] += line.product_uom_qty
                     sale_products_data[categ_name][product_name]['price_total'] += amount_bs
                     sale_products_data[categ_name][product_name]['price_total_usd'] += amount_usd
+                    # Fíjate que aquí NO ESTAMOS sumando a total_sale_usd ni total_sale_bs
 
-            # ---------------------------------------------------------------------
             # 3. CICLO DE PAGOS
-            # ---------------------------------------------------------------------
             for invoice in order.invoice_ids.filtered(lambda inv: inv.state == 'posted' and inv.payment_state in ('in_payment', 'paid')):
                 for payment in invoice._get_reconciled_payments():
                     if payment.id in processed_payment_ids:
