@@ -1,5 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from datetime import datetime, time
 import pytz
 
 class ReportGlobalSalesDetails(models.AbstractModel):
@@ -11,8 +12,20 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         start_date_str = data.get('start_date')
         end_date_str = data.get('end_date')
         
-        start_date = fields.Datetime.from_string(start_date_str)
-        end_date = fields.Datetime.from_string(end_date_str)
+        # 1. Convertimos el string a objeto Date
+        start_d = fields.Date.from_string(start_date_str)
+        end_d = fields.Date.from_string(end_date_str)
+        
+        # 2. Tomamos la zona horaria (America/Caracas)
+        user_tz = pytz.timezone(self.env.user.tz or 'America/Caracas')
+        
+        # 3. Forzamos 00:00:00 para el inicio y 23:59:59 para el fin, convirtiendo a UTC (hora de la BD de Odoo)
+        start_dt_utc = user_tz.localize(datetime.combine(start_d, time.min)).astimezone(pytz.utc).replace(tzinfo=None)
+        end_dt_utc = user_tz.localize(datetime.combine(end_d, time.max)).astimezone(pytz.utc).replace(tzinfo=None)
+        
+        # 4. Convertimos a string para usarlo en el .search()
+        search_start = fields.Datetime.to_string(start_dt_utc)
+        search_end = fields.Datetime.to_string(end_dt_utc)
         
         company = self.env.company
         currency_usd_obj = self.env.ref('base.USD')
@@ -84,7 +97,8 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         sale_orders = self.env['sale.order'].search([
             ('date_order', '>=', start_date_str),
             ('date_order', '<=', end_date_str),
-            ('state', 'in', ['sale', 'done'])
+            ('state', 'in', ['sale', 'done']),
+            ('invoice_status', '=', 'invoiced')
         ])
         
         processed_payment_ids = set()
