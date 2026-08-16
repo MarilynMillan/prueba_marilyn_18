@@ -33,8 +33,8 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         # Tasa Promedio
         lista = self.env['res.currency.rate'].search([
             ('currency_id', '=', currency_usd_obj.id), 
-            ('name', '>=', start_date.date()), 
-            ('name', '<=', end_date.date())
+            ('name', '>=', start_date), 
+            ('name', '<=', end_date)
         ])
         
         if lista:
