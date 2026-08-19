@@ -60,10 +60,6 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         ])
 
         for order in pos_orders:
-            tasa_orden = getattr(order, 'tasa_dia', 0.0)
-            if not tasa_orden or tasa_orden <= 0:
-                tasa_orden = tasa_promedio
-                
             # En POS la moneda suele ser la base de la compañía, o order.currency_id
             for line in order.lines:
                 categ_name = line.product_id.categ_id.name or 'Sin Categoría'
@@ -80,9 +76,8 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                         'price_total_usd': 0.0
                     }
                 
-                # POS is assumed to be in BS (company base currency)
                 amount_bs = line.price_subtotal_incl
-                amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
+                amount_usd = (amount_bs / tasa_promedio) if tasa_promedio else 0.0
                 
                 pos_products_data[categ_name][product_name]['quantity'] += line.qty
                 pos_products_data[categ_name][product_name]['price_total'] += amount_bs
@@ -95,12 +90,8 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                 payment_name = payment.payment_method_id.name
                 if payment_name not in payments_data:
                     payments_data[payment_name] = {'name': payment_name, 'total': 0.0, 'total_usd': 0.0}
-                
-                amount_bs = payment.amount
-                amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
-                
-                payments_data[payment_name]['total'] += amount_bs
-                payments_data[payment_name]['total_usd'] += amount_usd
+                payments_data[payment_name]['total'] += payment.amount
+                payments_data[payment_name]['total_usd'] += (payment.amount / tasa_promedio) if tasa_promedio else 0.0
 
         # --- Sale Orders ---
         sale_orders = self.env['sale.order'].search([
