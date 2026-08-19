@@ -4,8 +4,8 @@ class GlobalSalesDetailsWizard(models.TransientModel):
     _name = 'global.sales.details.wizard'
     _description = 'Global Sales Details Wizard'
 
-    start_date = fields.Datetime(string='Start Date', required=True, default=fields.Datetime.now)
-    end_date = fields.Datetime(string='End Date', required=True, default=fields.Datetime.now)
+    start_date = fields.Date(string='Start Date', required=True, default=fields.Date.context_today)
+    end_date = fields.Date(string='End Date', required=True, default=fields.Date.context_today)
 
     def generate_report(self):
         data = {

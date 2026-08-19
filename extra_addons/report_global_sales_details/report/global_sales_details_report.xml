@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="paperformat_global_sales_details" model="report.paperformat">
+        <field name="name">Detalles Globales de Ventas Paperformat</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">20</field>
+        <field name="margin_bottom">30</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">15</field>
+        <field name="dpi">90</field>
+    </record>
+
     <record id="action_report_global_sales" model="ir.actions.report">
         <field name="name">Detalle Global de Ventas</field>
         <field name="model">global.sales.details.wizard</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_global_sales_details.report_template</field>
         <field name="report_file">report_global_sales_details.report_template</field>
+        <field name="paperformat_id" ref="report_global_sales_details.paperformat_global_sales_details"/>
         <field name="binding_model_id" eval="False"/>
     </record>
 
@@ -40,14 +57,17 @@
                                 <t t-foreach="category['products']" t-as="line">
                                     <tr>
                                         <td style="padding-left: 20px;"><t t-esc="line['product_name']"/></td>
-                                        <td class="text-end"><t t-esc="line['quantity']"/> <t t-esc="line['uom']"/></td>
+                                        <td class="text-end">
+                                            <t t-esc="line['quantity']" t-options='{"widget": "float", "precision": 2}'/>
+                                            <t t-esc="line['uom']"/>
+                                        </td>
                                         <td class="text-end"><t t-esc="line['price_total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
                                         <td class="text-end"><t t-esc="line['price_total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
                                     </tr>
                                 </t>
                                 <tr class="text-muted" style="border-top: 1px solid #dee2e6;">
                                     <td class="text-end"><strong>Total <t t-esc="category['name']"/></strong></td>
-                                    <td class="text-end"><strong><t t-esc="category['subtotal_qty']"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_qty']" t-options='{"widget": "float", "precision": 2}'/></strong></td>
                                     <td class="text-end"><strong><t t-esc="category['subtotal_bs']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
                                     <td class="text-end"><strong><t t-esc="category['subtotal_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
                                 </tr>
@@ -85,14 +105,17 @@
                                 <t t-foreach="category['products']" t-as="line">
                                     <tr>
                                         <td style="padding-left: 20px;"><t t-esc="line['product_name']"/></td>
-                                        <td class="text-end"><t t-esc="line['quantity']"/> <t t-esc="line['uom']"/></td>
+                                        <td class="text-end">
+                                            <t t-esc="line['quantity']" t-options='{"widget": "float", "precision": 2}'/>
+                                            <t t-esc="line['uom']"/>
+                                        </td>
                                         <td class="text-end"><t t-esc="line['price_total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
                                         <td class="text-end"><t t-esc="line['price_total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
                                     </tr>
                                 </t>
                                 <tr class="text-muted" style="border-top: 1px solid #dee2e6;">
                                     <td class="text-end"><strong>Total <t t-esc="category['name']"/></strong></td>
-                                    <td class="text-end"><strong><t t-esc="category['subtotal_qty']"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_qty']" t-options='{"widget": "float", "precision": 2}'/></strong></td>
                                     <td class="text-end"><strong><t t-esc="category['subtotal_bs']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
                                     <td class="text-end"><strong><t t-esc="category['subtotal_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
                                 </tr>
