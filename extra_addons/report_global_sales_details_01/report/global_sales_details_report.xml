@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_global_sales" model="ir.actions.report">
+        <field name="name">Detalle Global de Ventas</field>
+        <field name="model">global.sales.details.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_global_sales_details.report_template</field>
+        <field name="report_file">report_global_sales_details.report_template</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <template id="report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="text-center">
+                        <h2>Detalles de ventas Globales</h2>
+                        <strong><t t-esc="date_start" t-options="{'widget': 'date'}"/> - <t t-esc="date_stop" t-options="{'widget': 'date'}"/></strong>
+                    </div>
+
+                    <br/>
+                    
+                    <h3>Ventas (Punto de Venta)</h3>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Total Bs</th>
+                                <th class="text-end">Total USD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="pos_products" t-as="category">
+                                <tr class="table-light">
+                                    <td colspan="4">
+                                        <strong><t t-esc="category['name']"/></strong>
+                                    </td>
+                                </tr>
+                                <t t-foreach="category['products']" t-as="line">
+                                    <tr>
+                                        <td style="padding-left: 20px;"><t t-esc="line['product_name']"/></td>
+                                        <td class="text-end"><t t-esc="line['quantity']"/> <t t-esc="line['uom']"/></td>
+                                        <td class="text-end"><t t-esc="line['price_total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                        <td class="text-end"><t t-esc="line['price_total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                                    </tr>
+                                </t>
+                                <tr class="text-muted" style="border-top: 1px solid #dee2e6;">
+                                    <td class="text-end"><strong>Total <t t-esc="category['name']"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_qty']"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_bs']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
+                                </tr>
+                            </t>
+                            <t t-if="pos_products">
+                                <tr class="table-active">
+                                    <td><strong>Total Punto de Venta</strong></td>
+                                    <td class="text-end"></td>
+                                    <td class="text-end"><strong><t t-esc="total_pos_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="total_pos_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <br/>
+                    
+                    <h3>Ventas (Órdenes de Venta)</h3>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Total Bs</th>
+                                <th class="text-end">Total USD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="sale_products" t-as="category">
+                                <tr class="table-light">
+                                    <td colspan="4">
+                                        <strong><t t-esc="category['name']"/></strong>
+                                    </td>
+                                </tr>
+                                <t t-foreach="category['products']" t-as="line">
+                                    <tr>
+                                        <td style="padding-left: 20px;"><t t-esc="line['product_name']"/></td>
+                                        <td class="text-end"><t t-esc="line['quantity']"/> <t t-esc="line['uom']"/></td>
+                                        <td class="text-end"><t t-esc="line['price_total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                        <td class="text-end"><t t-esc="line['price_total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                                    </tr>
+                                </t>
+                                <tr class="text-muted" style="border-top: 1px solid #dee2e6;">
+                                    <td class="text-end"><strong>Total <t t-esc="category['name']"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_qty']"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_bs']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
+                                </tr>
+                            </t>
+                            <t t-if="sale_products">
+                                <tr class="table-active">
+                                    <td><strong>Total Órdenes de Venta</strong></td>
+                                    <td class="text-end"></td>
+                                    <td class="text-end"><strong><t t-esc="total_sale_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="total_sale_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <br/>
+
+                    <h3>Pagos Recibidos</h3>
+                    <table class="table table-sm" style="width: 50%;">
+                        <tbody>
+                            <t t-foreach="payments" t-as="payment">
+                                <tr>
+                                    <td><t t-esc="payment['name']"/></td>
+                                    <td class="text-end"><t t-esc="payment['total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                    <td class="text-end"><t t-esc="payment['total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    
+                    <br/>
+
+                    <h3>Resumen General de Ventas</h3>
+                    <table class="table table-bordered table-sm" style="width: 60%;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Origen</th>
+                                <th class="text-end">Total Bs</th>
+                                <th class="text-end">Total USD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Punto de Venta (POS)</td>
+                                <td class="text-end"><t t-esc="total_pos_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                <td class="text-end"><t t-esc="total_pos_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                            </tr>
+                            <tr>
+                                <td>Órdenes de Venta (Sale)</td>
+                                <td class="text-end"><t t-esc="total_sale_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                <td class="text-end"><t t-esc="total_sale_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                            </tr>
+                            <tr class="table-active font-weight-bold">
+                                <td><strong>Total General</strong></td>
+                                <td class="text-end"><strong><t t-esc="total_general_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                <td class="text-end"><strong><t t-esc="total_general_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
