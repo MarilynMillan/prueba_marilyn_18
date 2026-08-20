@@ -1,1402 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- ========================================================= -->
-    <!-- PAPER FORMAT -->
-    <!-- ========================================================= -->
-
-    <record id="paperformat_global_sales_details"
-            model="report.paperformat">
-
-        <field name="name">
-            Detalles Globales de Ventas Paperformat
-        </field>
-
+    <record id="paperformat_global_sales_details" model="report.paperformat">
+        <field name="name">Detalles Globales de Ventas Paperformat</field>
         <field name="default" eval="False"/>
         <field name="format">A4</field>
-
         <field name="page_height">0</field>
         <field name="page_width">0</field>
-
         <field name="orientation">Portrait</field>
-
         <field name="margin_top">20</field>
         <field name="margin_bottom">5</field>
         <field name="margin_left">5</field>
         <field name="margin_right">5</field>
-
         <field name="header_line" eval="False"/>
         <field name="header_spacing">0</field>
-
-        <field name="dpi">90</field>
-
+        <field name="dpi">20</field>
     </record>
 
-
-    <!-- ========================================================= -->
-    <!-- REPORT ACTION -->
-    <!-- ========================================================= -->
-
-    <record id="action_report_global_sales"
-            model="ir.actions.report">
-
-        <field name="name">
-            Detalle Global de Ventas
-        </field>
-
-        <field name="model">
-            global.sales.details.wizard
-        </field>
-
-        <field name="report_type">
-            qweb-pdf
-        </field>
-
-        <field name="report_name">
-            report_global_sales_details.report_template
-        </field>
-
-        <field name="report_file">
-            report_global_sales_details.report_template
-        </field>
-
-        <field name="paperformat_id"
-               ref="report_global_sales_details.paperformat_global_sales_details"/>
-
-        <field name="binding_model_id"
-               eval="False"/>
-
+    <record id="action_report_global_sales" model="ir.actions.report">
+        <field name="name">Detalle Global de Ventas</field>
+        <field name="model">global.sales.details.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_global_sales_details.report_template</field>
+        <field name="report_file">report_global_sales_details.report_template</field>
+        <field name="paperformat_id" ref="report_global_sales_details.paperformat_global_sales_details"/>
+        <field name="binding_model_id" eval="False"/>
     </record>
-
-
-    <!-- ========================================================= -->
-    <!-- REPORT TEMPLATE -->
-    <!-- ========================================================= -->
 
     <template id="report_template">
-
         <t t-call="web.html_container">
-
             <t t-call="web.basic_layout">
-
-                <div class="page"
-                     style="
-                        width: 100%;
-                        font-size: 10px;
-                        font-family: Arial, sans-serif;
-                     ">
-
-
-                    <!-- ========================================= -->
-                    <!-- ENCABEZADO -->
-                    <!-- ========================================= -->
-
-                    <div class="text-center"
-                         style="margin-bottom: 15px;">
-
-                        <h2 style="
-                            margin-bottom: 5px;
-                            font-size: 18px;
-                        ">
-                            Detalles de Ventas Globales
-                        </h2>
-
-                        <strong style="font-size: 11px;">
-
-                            <t t-esc="date_start"
-                               t-options="{'widget': 'date'}"/>
-
-                            -
-
-                            <t t-esc="date_stop"
-                               t-options="{'widget': 'date'}"/>
-
-                        </strong>
-
+                <div class="page">
+                    <div class="text-center">
+                        <h2>Detalles de ventas Globales</h2>
+                        <strong><t t-esc="date_start" t-options="{'widget': 'date'}"/> - <t t-esc="date_stop" t-options="{'widget': 'date'}"/></strong>
                     </div>
 
-
-                    <!-- ========================================= -->
-                    <!-- VENTAS PUNTO DE VENTA -->
-                    <!-- ========================================= -->
-
-                    <h3 style="
-                        margin-top: 15px;
-                        margin-bottom: 8px;
-                        font-size: 14px;
-                    ">
-                        Ventas (Punto de Venta)
-                    </h3>
-
-
-                    <table class="table table-sm"
-                           style="
-                                width: 100%;
-                                table-layout: fixed;
-                                border-collapse: collapse;
-                           ">
-
-                        <colgroup>
-
-                            <col style="width: 55%;"/>
-
-                            <col style="width: 15%;"/>
-
-                            <col style="width: 15%;"/>
-
-                            <col style="width: 15%;"/>
-
-                        </colgroup>
-
-
-                        <thead style="display: table-header-group;">
-
-                            <tr style="
-                                background-color: #f2f2f2;
-                            ">
-
-                                <th style="
-                                    padding: 6px;
-                                    border-bottom: 1px solid #000;
-                                ">
-                                    Producto
-                                </th>
-
-
-                                <th class="text-end"
-                                    style="
-                                        padding: 6px;
-                                        border-bottom: 1px solid #000;
-                                    ">
-                                    Cantidad
-                                </th>
-
-
-                                <th class="text-end"
-                                    style="
-                                        padding: 6px;
-                                        border-bottom: 1px solid #000;
-                                    ">
-                                    Total Bs
-                                </th>
-
-
-                                <th class="text-end"
-                                    style="
-                                        padding: 6px;
-                                        border-bottom: 1px solid #000;
-                                    ">
-                                    Total USD
-                                </th>
-
+                    <br/>
+                    
+                    <h3 style="margin-top: 15px; margin-bottom: 8px;">Ventas (Punto de Venta)</h3>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Total Bs</th>
+                                <th class="text-end">Total USD</th>
                             </tr>
-
                         </thead>
-
-
                         <tbody>
-
-
-                            <t t-foreach="pos_products"
-                               t-as="category">
-
-
-                                <!-- CATEGORIA -->
-
-                                <tr style="
-                                    page-break-inside: avoid;
-                                    background-color: #eeeeee;
-                                ">
-
-                                    <td colspan="4"
-                                        style="
-                                            padding: 6px;
-                                        ">
-
-                                        <strong>
-
-                                            <t t-esc="category['name']"/>
-
-                                        </strong>
-
+                            <t t-foreach="pos_products" t-as="category">
+                                <tr class="table-light">
+                                    <td colspan="4">
+                                        <strong><t t-esc="category['name']"/></strong>
                                     </td>
-
                                 </tr>
-
-
-                                <!-- PRODUCTOS -->
-
-                                <t t-foreach="category['products']"
-                                   t-as="line">
-
-
-                                    <tr style="
-                                        page-break-inside: avoid;
-                                    ">
-
-
-                                        <td style="
-                                            padding:
-                                                4px
-                                                6px
-                                                4px
-                                                20px;
-                                        ">
-
-                                            <t t-esc="line['product_name']"/>
-
+                                <t t-foreach="category['products']" t-as="line">
+                                    <tr>
+                                        <td style="padding-left: 20px;"><t t-esc="line['product_name']"/></td>
+                                        <td class="text-end">
+                                            <t t-esc="line['quantity']" t-options='{"widget": "float", "precision": 2}'/> 
+                                            <t t-esc="line['uom']"/>
                                         </td>
-
-
-                                        <td class="text-end"
-                                            style="
-                                                padding: 4px 6px;
-                                            ">
-
-                                            <t t-esc="line['quantity']"
-                                               t-options='{
-                                                   "widget": "float",
-                                                   "precision": 2
-                                               }'/>
-
-                                            <br/>
-
-                                            <small>
-
-                                                <t t-esc="line['uom']"/>
-
-                                            </small>
-
-                                        </td>
-
-
-                                        <td class="text-end"
-                                            style="
-                                                padding: 4px 6px;
-                                                white-space: nowrap;
-                                            ">
-
-                                            <t t-esc="line['price_total']"
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   company.currency_id
-                                               }"/>
-
-                                        </td>
-
-
-                                        <td class="text-end"
-                                            style="
-                                                padding: 4px 6px;
-                                                white-space: nowrap;
-                                            ">
-
-                                            <t t-esc="
-                                                line['price_total_usd']
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   currency_usd_obj
-                                               }"/>
-
-                                        </td>
-
-
+                                        <td class="text-end"><t t-esc="line['price_total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                        <td class="text-end"><t t-esc="line['price_total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
                                     </tr>
-
-
                                 </t>
-
-
-                                <!-- SUBTOTAL CATEGORIA -->
-
-                                <tr style="
-                                    page-break-inside: avoid;
-                                    border-top:
-                                        1px solid #999;
-                                ">
-
-
-                                    <td class="text-end"
-                                        style="padding: 6px;">
-
-                                        <strong>
-
-                                            Total
-
-                                            <t t-esc="
-                                                category['name']
-                                            "/>
-
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="padding: 6px;">
-
-                                        <strong>
-
-                                            <t t-esc="
-                                                category['subtotal_qty']
-                                            "
-                                               t-options='{
-                                                   "widget": "float",
-                                                   "precision": 2
-                                               }'/>
-
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="padding: 6px;">
-
-                                        <strong>
-
-                                            <t t-esc="
-                                                category['subtotal_bs']
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   company.currency_id
-                                               }"/>
-
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="padding: 6px;">
-
-                                        <strong>
-
-                                            <t t-esc="
-                                                category['subtotal_usd']
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   currency_usd_obj
-                                               }"/>
-
-                                        </strong>
-
-                                    </td>
-
-
+                                <tr class="text-muted" style="border-top: 1px solid #dee2e6;">
+                                    <td class="text-end"><strong>Total <t t-esc="category['name']"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_qty']" t-options='{"widget": "float", "precision": 2}'/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_bs']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
                                 </tr>
-
-
                             </t>
-
-
-                            <!-- TOTAL PUNTO DE VENTA -->
-
                             <t t-if="pos_products">
-
-                                <tr style="
-                                    page-break-inside: avoid;
-                                    background-color: #dddddd;
-                                    border-top:
-                                        2px solid #555;
-                                ">
-
-
-                                    <td style="padding: 7px;">
-
-                                        <strong>
-                                            Total Punto de Venta
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td></td>
-
-
-                                    <td class="text-end"
-                                        style="padding: 7px;">
-
-                                        <strong>
-
-                                            <t t-esc="
-                                                total_pos_bs
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   company.currency_id
-                                               }"/>
-
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="padding: 7px;">
-
-                                        <strong>
-
-                                            <t t-esc="
-                                                total_pos_usd
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   currency_usd_obj
-                                               }"/>
-
-                                        </strong>
-
-                                    </td>
-
-
+                                <tr class="table-active">
+                                    <td><strong>Total Punto de Venta</strong></td>
+                                    <td class="text-end"></td>
+                                    <td class="text-end"><strong><t t-esc="total_pos_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="total_pos_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
                                 </tr>
-
                             </t>
-
-
                         </tbody>
+                    </table>
+                     <br/>
+                       <h3>Pagos Recibidos</h3>
+                                        <table class="table table-sm" style="width: 50%;">
+                                            <tbody>
+                                                <t t-foreach="payments" t-as="payment">
+                                                    <tr>
+                                                        <td><t t-esc="payment['name']"/></td>
+                                                        <td class="text-end"><t t-esc="payment['total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                                        <td class="text-end"><t t-esc="payment['total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
 
+                    <br/>
+                    
+                    <h3>Ventas (Órdenes de Venta)</h3>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Total Bs</th>
+                                <th class="text-end">Total USD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="sale_products" t-as="category">
+                                <tr class="table-light">
+                                    <td colspan="4">
+                                        <strong><t t-esc="category['name']"/></strong>
+                                    </td>
+                                </tr>
+                                <t t-foreach="category['products']" t-as="line">
+                                    <tr>
+                                        <td style="padding-left: 20px;"><t t-esc="line['product_name']"/></td>
+                                        <td class="text-end">
+                                            <t t-esc="line['quantity']" t-options='{"widget": "float", "precision": 2}'/> 
+                                            <t t-esc="line['uom']"/>
+                                        </td>
+                                        <td class="text-end"><t t-esc="line['price_total']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                        <td class="text-end"><t t-esc="line['price_total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                                    </tr>
+                                </t>
+                                <tr class="text-muted" style="border-top: 1px solid #dee2e6;">
+                                    <td class="text-end"><strong>Total <t t-esc="category['name']"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_qty']" t-options='{"widget": "float", "precision": 2}'/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_bs']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="category['subtotal_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
+                                </tr>
+                            </t>
+                            <t t-if="sale_products">
+                                <tr class="table-active">
+                                    <td><strong>Total Órdenes de Venta</strong></td>
+                                    <td class="text-end"></td>
+                                    <td class="text-end"><strong><t t-esc="total_sale_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                    <td class="text-end"><strong><t t-esc="total_sale_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
+                                </tr>
+                            </t>
+                        </tbody>
                     </table>
 
+                    <br/>
 
-                    <!-- ========================================= -->
-                    <!-- PAGOS RECIBIDOS -->
-                    <!-- ========================================= -->
-
-                    <div style="margin-top: 20px;">
-
-                        <h3 style="
-                            margin-bottom: 8px;
-                            font-size: 14px;
-                        ">
-                            Pagos Recibidos
-                        </h3>
-
-
-                        <table class="table table-sm"
-                               style="
-                                    width: 65%;
-                                    table-layout: fixed;
-                                    border-collapse: collapse;
-                               ">
-
-                            <colgroup>
-
-                                <col style="width: 50%;"/>
-
-                                <col style="width: 25%;"/>
-
-                                <col style="width: 25%;"/>
-
-                            </colgroup>
-
-
-                            <thead style="
-                                display: table-header-group;
-                                background-color: #f2f2f2;
-                            ">
-
-                                <tr>
-
-                                    <th style="
-                                        padding: 6px;
-                                        border-bottom:
-                                            1px solid #000;
-                                    ">
-                                        Método de Pago
-                                    </th>
-
-
-                                    <th class="text-end"
-                                        style="
-                                            padding: 6px;
-                                            border-bottom:
-                                                1px solid #000;
-                                        ">
-                                        Total Bs
-                                    </th>
-
-
-                                    <th class="text-end"
-                                        style="
-                                            padding: 6px;
-                                            border-bottom:
-                                                1px solid #000;
-                                        ">
-                                        Total USD
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-
-                                <t t-foreach="payments"
-                                   t-as="payment">
-
-                                    <tr style="
-                                        page-break-inside: avoid;
-                                    ">
-
-
-                                        <td style="
-                                            padding: 4px 6px;
-                                        ">
-
-                                            <t t-esc="
-                                                payment['name']
-                                            "/>
-
-                                        </td>
-
-
-                                        <td class="text-end"
-                                            style="
-                                                padding: 4px 6px;
-                                                white-space: nowrap;
-                                            ">
-
-                                            <t t-esc="
-                                                payment['total']
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   company.currency_id
-                                               }"/>
-
-                                        </td>
-
-
-                                        <td class="text-end"
-                                            style="
-                                                padding: 4px 6px;
-                                                white-space: nowrap;
-                                            ">
-
-                                            <t t-esc="
-                                                payment['total_usd']
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   currency_usd_obj
-                                               }"/>
-
-                                        </td>
-
-
-                                    </tr>
-
-                                </t>
-
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
-                    <!-- ========================================= -->
-                    <!-- VENTAS ORDENES DE VENTA -->
-                    <!-- ========================================= -->
-
-                    <div style="margin-top: 20px;">
-
-
-                        <h3 style="
-                            margin-bottom: 8px;
-                            font-size: 14px;
-                        ">
-                            Ventas (Órdenes de Venta)
-                        </h3>
-
-
-                        <table class="table table-sm"
-                               style="
-                                    width: 100%;
-                                    table-layout: fixed;
-                                    border-collapse: collapse;
-                               ">
-
-
-                            <colgroup>
-
-                                <col style="width: 55%;"/>
-
-                                <col style="width: 15%;"/>
-
-                                <col style="width: 15%;"/>
-
-                                <col style="width: 15%;"/>
-
-                            </colgroup>
-
-
-                            <thead style="
-                                display: table-header-group;
-                            ">
-
-                                <tr style="
-                                    background-color: #f2f2f2;
-                                ">
-
-
-                                    <th style="
-                                        padding: 6px;
-                                        border-bottom:
-                                            1px solid #000;
-                                    ">
-                                        Producto
-                                    </th>
-
-
-                                    <th class="text-end"
-                                        style="
-                                            padding: 6px;
-                                            border-bottom:
-                                                1px solid #000;
-                                        ">
-                                        Cantidad
-                                    </th>
-
-
-                                    <th class="text-end"
-                                        style="
-                                            padding: 6px;
-                                            border-bottom:
-                                                1px solid #000;
-                                        ">
-                                        Total Bs
-                                    </th>
-
-
-                                    <th class="text-end"
-                                        style="
-                                            padding: 6px;
-                                            border-bottom:
-                                                1px solid #000;
-                                        ">
-                                        Total USD
-                                    </th>
-
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-
-                                <t t-foreach="sale_products"
-                                   t-as="category">
-
-
-                                    <!-- CATEGORIA -->
-
-                                    <tr style="
-                                        page-break-inside: avoid;
-                                        background-color: #eeeeee;
-                                    ">
-
-                                        <td colspan="4"
-                                            style="padding: 6px;">
-
-                                            <strong>
-
-                                                <t t-esc="
-                                                    category['name']
-                                                "/>
-
-                                            </strong>
-
-                                        </td>
-
-                                    </tr>
-
-
-                                    <!-- PRODUCTOS -->
-
-                                    <t t-foreach="
-                                        category['products']
-                                    "
-                                       t-as="line">
-
-
-                                        <tr style="
-                                            page-break-inside: avoid;
-                                        ">
-
-
-                                            <td style="
-                                                padding:
-                                                    4px
-                                                    6px
-                                                    4px
-                                                    20px;
-                                            ">
-
-                                                <t t-esc="
-                                                    line['product_name']
-                                                "/>
-
-                                            </td>
-
-
-                                            <td class="text-end"
-                                                style="
-                                                    padding: 4px 6px;
-                                                ">
-
-                                                <t t-esc="
-                                                    line['quantity']
-                                                "
-                                                   t-options='{
-                                                       "widget": "float",
-                                                       "precision": 2
-                                                   }'/>
-
-                                                <br/>
-
-                                                <small>
-
-                                                    <t t-esc="
-                                                        line['uom']
-                                                    "/>
-
-                                                </small>
-
-                                            </td>
-
-
-                                            <td class="text-end"
-                                                style="
-                                                    padding: 4px 6px;
-                                                    white-space: nowrap;
-                                                ">
-
-                                                <t t-esc="
-                                                    line['price_total']
-                                                "
-                                                   t-options="{
-                                                       'widget': 'monetary',
-                                                       'display_currency':
-                                                       company.currency_id
-                                                   }"/>
-
-                                            </td>
-
-
-                                            <td class="text-end"
-                                                style="
-                                                    padding: 4px 6px;
-                                                    white-space: nowrap;
-                                                ">
-
-                                                <t t-esc="
-                                                    line['price_total_usd']
-                                                "
-                                                   t-options="{
-                                                       'widget': 'monetary',
-                                                       'display_currency':
-                                                       currency_usd_obj
-                                                   }"/>
-
-                                            </td>
-
-
-                                        </tr>
-
-
-                                    </t>
-
-
-                                    <!-- SUBTOTAL CATEGORIA -->
-
-                                    <tr style="
-                                        page-break-inside: avoid;
-                                        border-top:
-                                            1px solid #999;
-                                    ">
-
-
-                                        <td class="text-end"
-                                            style="padding: 6px;">
-
-                                            <strong>
-
-                                                Total
-
-                                                <t t-esc="
-                                                    category['name']
-                                                "/>
-
-                                            </strong>
-
-                                        </td>
-
-
-                                        <td class="text-end"
-                                            style="padding: 6px;">
-
-                                            <strong>
-
-                                                <t t-esc="
-                                                    category['subtotal_qty']
-                                                "
-                                                   t-options='{
-                                                       "widget": "float",
-                                                       "precision": 2
-                                                   }'/>
-
-                                            </strong>
-
-                                        </td>
-
-
-                                        <td class="text-end"
-                                            style="padding: 6px;">
-
-                                            <strong>
-
-                                                <t t-esc="
-                                                    category['subtotal_bs']
-                                                "
-                                                   t-options="{
-                                                       'widget': 'monetary',
-                                                       'display_currency':
-                                                       company.currency_id
-                                                   }"/>
-
-                                            </strong>
-
-                                        </td>
-
-
-                                        <td class="text-end"
-                                            style="padding: 6px;">
-
-                                            <strong>
-
-                                                <t t-esc="
-                                                    category['subtotal_usd']
-                                                "
-                                                   t-options="{
-                                                       'widget': 'monetary',
-                                                       'display_currency':
-                                                       currency_usd_obj
-                                                   }"/>
-
-                                            </strong>
-
-                                        </td>
-
-
-                                    </tr>
-
-
-                                </t>
-
-
-                                <!-- TOTAL ORDENES DE VENTA -->
-
-                                <t t-if="sale_products">
-
-                                    <tr style="
-                                        page-break-inside: avoid;
-                                        background-color: #dddddd;
-                                        border-top:
-                                            2px solid #555;
-                                    ">
-
-
-                                        <td style="padding: 7px;">
-
-                                            <strong>
-                                                Total Órdenes de Venta
-                                            </strong>
-
-                                        </td>
-
-
-                                        <td></td>
-
-
-                                        <td class="text-end"
-                                            style="padding: 7px;">
-
-                                            <strong>
-
-                                                <t t-esc="
-                                                    total_sale_bs
-                                                "
-                                                   t-options="{
-                                                       'widget': 'monetary',
-                                                       'display_currency':
-                                                       company.currency_id
-                                                   }"/>
-
-                                            </strong>
-
-                                        </td>
-
-
-                                        <td class="text-end"
-                                            style="padding: 7px;">
-
-                                            <strong>
-
-                                                <t t-esc="
-                                                    total_sale_usd
-                                                "
-                                                   t-options="{
-                                                       'widget': 'monetary',
-                                                       'display_currency':
-                                                       currency_usd_obj
-                                                   }"/>
-
-                                            </strong>
-
-                                        </td>
-
-
-                                    </tr>
-
-                                </t>
-
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
-                    <!-- ========================================= -->
-                    <!-- ORDENES NO FACTURADAS -->
-                    <!-- ========================================= -->
-
+                    
+                    <!-- NUEVA SECCIÓN: Órdenes no facturadas -->
                     <t t-if="other_sales">
-
-
-                        <div style="margin-top: 20px;">
-
-
-                            <h3 style="
-                                margin-bottom: 8px;
-                                font-size: 14px;
-                            ">
-                                Órdenes de Venta (No Facturadas)
-                            </h3>
-
-
-                            <table class="table table-sm"
-                                   style="
-                                        width: 65%;
-                                        table-layout: fixed;
-                                        border-collapse: collapse;
-                                   ">
-
-
-                                <colgroup>
-
-                                    <col style="width: 50%;"/>
-
-                                    <col style="width: 25%;"/>
-
-                                    <col style="width: 25%;"/>
-
-                                </colgroup>
-
-
-                                <thead style="
-                                    display: table-header-group;
-                                    background-color: #f2f2f2;
-                                ">
-
+                        <h3>Órdenes de Venta (No Facturadas)</h3>
+                        <table class="table table-bordered table-sm" style="width: 60%;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Estado</th>
+                                    <th class="text-end">Total Bs</th>
+                                    <th class="text-end">Total USD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="other_sales" t-as="other">
                                     <tr>
-
-
-                                        <th style="
-                                            padding: 6px;
-                                            border-bottom:
-                                                1px solid #000;
-                                        ">
-                                            Estado
-                                        </th>
-
-
-                                        <th class="text-end"
-                                            style="
-                                                padding: 6px;
-                                                border-bottom:
-                                                    1px solid #000;
-                                            ">
-                                            Total Bs
-                                        </th>
-
-
-                                        <th class="text-end"
-                                            style="
-                                                padding: 6px;
-                                                border-bottom:
-                                                    1px solid #000;
-                                            ">
-                                            Total USD
-                                        </th>
-
-
+                                        <td><t t-esc="other['name']"/></td>
+                                        <td class="text-end"><t t-esc="other['total_bs']" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                        <td class="text-end"><t t-esc="other['total_usd']" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
                                     </tr>
-
-                                </thead>
-
-
-                                <tbody>
-
-
-                                    <t t-foreach="other_sales"
-                                       t-as="other">
-
-
-                                        <tr style="
-                                            page-break-inside: avoid;
-                                        ">
-
-
-                                            <td style="
-                                                padding: 4px 6px;
-                                            ">
-
-                                                <t t-esc="
-                                                    other['name']
-                                                "/>
-
-                                            </td>
-
-
-                                            <td class="text-end"
-                                                style="
-                                                    padding: 4px 6px;
-                                                    white-space: nowrap;
-                                                ">
-
-                                                <t t-esc="
-                                                    other['total_bs']
-                                                "
-                                                   t-options="{
-                                                       'widget': 'monetary',
-                                                       'display_currency':
-                                                       company.currency_id
-                                                   }"/>
-
-                                            </td>
-
-
-                                            <td class="text-end"
-                                                style="
-                                                    padding: 4px 6px;
-                                                    white-space: nowrap;
-                                                ">
-
-                                                <t t-esc="
-                                                    other['total_usd']
-                                                "
-                                                   t-options="{
-                                                       'widget': 'monetary',
-                                                       'display_currency':
-                                                       currency_usd_obj
-                                                   }"/>
-
-                                            </td>
-
-
-                                        </tr>
-
-
-                                    </t>
-
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-
+                                </t>
+                            </tbody>
+                        </table>
                     </t>
 
-
-                    <!-- ========================================= -->
-                    <!-- RESUMEN GENERAL -->
-                    <!-- ========================================= -->
-
-                    <div style="margin-top: 25px;">
-
-
-                        <h3 style="
-                            margin-bottom: 8px;
-                            font-size: 14px;
-                        ">
-                            Resumen General de Ventas
-                        </h3>
-
-
-                        <table class="table table-sm"
-                               style="
-                                    width: 65%;
-                                    table-layout: fixed;
-                                    border-collapse: collapse;
-                               ">
-
-
-                            <colgroup>
-
-                                <col style="width: 50%;"/>
-
-                                <col style="width: 25%;"/>
-
-                                <col style="width: 25%;"/>
-
-                            </colgroup>
-
-
-                            <thead style="
-                                display: table-header-group;
-                                background-color: #f2f2f2;
-                            ">
-
-                                <tr>
-
-
-                                    <th style="
-                                        padding: 6px;
-                                        border-bottom:
-                                            1px solid #000;
-                                    ">
-                                        Origen
-                                    </th>
-
-
-                                    <th class="text-end"
-                                        style="
-                                            padding: 6px;
-                                            border-bottom:
-                                                1px solid #000;
-                                        ">
-                                        Total Bs
-                                    </th>
-
-
-                                    <th class="text-end"
-                                        style="
-                                            padding: 6px;
-                                            border-bottom:
-                                                1px solid #000;
-                                        ">
-                                        Total USD
-                                    </th>
-
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-
-                                <!-- POS -->
-
-                                <tr style="
-                                    page-break-inside: avoid;
-                                ">
-
-
-                                    <td style="padding: 5px 6px;">
-
-                                        Punto de Venta (POS)
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="
-                                            padding: 5px 6px;
-                                            white-space: nowrap;
-                                        ">
-
-                                        <t t-esc="total_pos_bs"
-                                           t-options="{
-                                               'widget': 'monetary',
-                                               'display_currency':
-                                               company.currency_id
-                                           }"/>
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="
-                                            padding: 5px 6px;
-                                            white-space: nowrap;
-                                        ">
-
-                                        <t t-esc="total_pos_usd"
-                                           t-options="{
-                                               'widget': 'monetary',
-                                               'display_currency':
-                                               currency_usd_obj
-                                           }"/>
-
-                                    </td>
-
-
-                                </tr>
-
-
-                                <!-- SALE -->
-
-                                <tr style="
-                                    page-break-inside: avoid;
-                                ">
-
-
-                                    <td style="padding: 5px 6px;">
-
-                                        Órdenes de Venta (Sale)
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="
-                                            padding: 5px 6px;
-                                            white-space: nowrap;
-                                        ">
-
-                                        <t t-esc="total_sale_bs"
-                                           t-options="{
-                                               'widget': 'monetary',
-                                               'display_currency':
-                                               company.currency_id
-                                           }"/>
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="
-                                            padding: 5px 6px;
-                                            white-space: nowrap;
-                                        ">
-
-                                        <t t-esc="total_sale_usd"
-                                           t-options="{
-                                               'widget': 'monetary',
-                                               'display_currency':
-                                               currency_usd_obj
-                                           }"/>
-
-                                    </td>
-
-
-                                </tr>
-
-
-                                <!-- TOTAL GENERAL -->
-
-                                <tr style="
-                                    page-break-inside: avoid;
-                                    background-color: #dddddd;
-                                    border-top:
-                                        2px solid #555;
-                                ">
-
-
-                                    <td style="padding: 7px;">
-
-                                        <strong>
-                                            Total General
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="
-                                            padding: 7px;
-                                            white-space: nowrap;
-                                        ">
-
-                                        <strong>
-
-                                            <t t-esc="
-                                                total_general_bs
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   company.currency_id
-                                               }"/>
-
-                                        </strong>
-
-                                    </td>
-
-
-                                    <td class="text-end"
-                                        style="
-                                            padding: 7px;
-                                            white-space: nowrap;
-                                        ">
-
-                                        <strong>
-
-                                            <t t-esc="
-                                                total_general_usd
-                                            "
-                                               t-options="{
-                                                   'widget': 'monetary',
-                                                   'display_currency':
-                                                   currency_usd_obj
-                                               }"/>
-
-                                        </strong>
-
-                                    </td>
-
-
-                                </tr>
-
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
+                    
+                    <br/>
+
+                    <h3>Resumen General de Ventas</h3>
+                    <table class="table table-bordered table-sm" style="width: 60%;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Origen</th>
+                                <th class="text-end">Total Bs</th>
+                                <th class="text-end">Total USD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Punto de Venta (POS)</td>
+                                <td class="text-end"><t t-esc="total_pos_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                <td class="text-end"><t t-esc="total_pos_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                            </tr>
+                            <tr>
+                                <td>Órdenes de Venta (Sale)</td>
+                                <td class="text-end"><t t-esc="total_sale_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></td>
+                                <td class="text-end"><t t-esc="total_sale_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></td>
+                            </tr>
+                            <tr class="table-active font-weight-bold">
+                                <td><strong>Total General</strong></td>
+                                <td class="text-end"><strong><t t-esc="total_general_bs" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/></strong></td>
+                                <td class="text-end"><strong><t t-esc="total_general_usd" t-options="{'widget': 'monetary', 'display_currency': currency_usd_obj}"/></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-
             </t>
-
         </t>
-
     </template>
-
 </odoo>
