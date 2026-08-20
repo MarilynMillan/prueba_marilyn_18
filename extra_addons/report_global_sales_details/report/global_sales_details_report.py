@@ -97,7 +97,17 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     payments_data[payment_name] = {'name': payment_name, 'total': 0.0, 'total_usd': 0.0}
 
                 amount_bs = payment.amount
-                amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
+
+                # Fetch double currency values if they exist
+                currency_amount = getattr(payment, 'currency_amount_total', 0.0)
+
+                # If the dual currency amount is provided and it's sensible (e.g., less than BS amount
+                # because USD is smaller numerically than BS), we use it. Otherwise fallback.
+                # In this setup, POS dual currency uses currency_amount_total for the foreign currency
+                if currency_amount and currency_amount > 0 and currency_amount < amount_bs:
+                    amount_usd = currency_amount
+                else:
+                    amount_usd = (amount_bs / tasa_orden) if tasa_orden else 0.0
 
                 payments_data[payment_name]['total'] += amount_bs
                 payments_data[payment_name]['total_usd'] += amount_usd
