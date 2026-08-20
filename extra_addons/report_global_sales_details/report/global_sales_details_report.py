@@ -54,8 +54,8 @@ class ReportGlobalSalesDetails(models.AbstractModel):
 
         # --- POS Orders ---
         pos_orders = self.env['pos.order'].search([
-            ('date_order', '>=', search_start), # SE CORRIGIÓ: Usar search_start para abarcar el día completo
-            ('date_order', '<=', search_end),   # SE CORRIGIÓ: Usar search_end
+            ('date_order', '>=', search_start),
+            ('date_order', '<=', search_end),
             ('state', 'in', ['paid', 'done', 'invoiced'])
         ])
 
@@ -102,7 +102,7 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                 payments_data[payment_name]['total'] += amount_bs
                 payments_data[payment_name]['total_usd'] += amount_usd
 
-        # --- Sale Orders ---
+        # --- Sale Orders (Facturadas) ---
         sale_orders = self.env['sale.order'].search([
             ('date_order', '>=', search_start),
             ('date_order', '<=', search_end),
@@ -111,7 +111,6 @@ class ReportGlobalSalesDetails(models.AbstractModel):
         ])
         
         # 1. CÁLCULO DIRECTO DEL TOTAL GENERAL (Solo Cabeceras)
-        # Reiniciamos las variables aquí para asegurar que no traigan basura
         total_sale_bs = 0.0
         total_sale_usd = 0.0
         
@@ -126,7 +125,6 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                 total_sale_usd += (order.amount_total / tasa_orden) if tasa_orden else 0.0
 
         # 2. DESGLOSE DE PRODUCTOS (Para la tabla del PDF)
-        # ESTE CICLO YA NO SUMA NADA A LOS TOTALES GENERALES
         processed_payment_ids = set()
         for order in sale_orders:
             tasa_orden = order.x_tasa if order.x_tasa and order.x_tasa > 0 else tasa_promedio
@@ -158,7 +156,6 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     sale_products_data[categ_name][product_name]['quantity'] += line.product_uom_qty
                     sale_products_data[categ_name][product_name]['price_total'] += amount_bs
                     sale_products_data[categ_name][product_name]['price_total_usd'] += amount_usd
-                    # Fíjate que aquí NO ESTAMOS sumando a total_sale_usd ni total_sale_bs
 
             # 3. CICLO DE PAGOS
             for invoice in order.invoice_ids.filtered(lambda inv: inv.state == 'posted' and inv.payment_state in ('in_payment', 'paid')):
@@ -184,7 +181,37 @@ class ReportGlobalSalesDetails(models.AbstractModel):
                     
                     payments_data[payment_name]['total'] += amount_bs
                     payments_data[payment_name]['total_usd'] += amount_usd
-                
+        
+        # --- OTRAS ÓRDENES DE VENTA (No facturadas) ---
+        other_sale_orders = self.env['sale.order'].search([
+            ('date_order', '>=', search_start),
+            ('date_order', '<=', search_end),
+            ('state', 'in', ['sale', 'done']),
+            ('invoice_status', '!=', 'invoiced') # Buscamos las que NO son 'invoiced'
+        ])
+
+        # Diccionario para agruparlas por su estado exacto
+        other_sales_summary = {
+            'to invoice': {'name': 'Por facturar', 'total_bs': 0.0, 'total_usd': 0.0},
+            'no': {'name': 'Nada que facturar', 'total_bs': 0.0, 'total_usd': 0.0},
+            'upselling': {'name': 'Oportunidad de venta adicional', 'total_bs': 0.0, 'total_usd': 0.0},
+        }
+
+        for order in other_sale_orders:
+            tasa_orden = order.x_tasa if order.x_tasa and order.x_tasa > 0 else tasa_promedio
+            status = order.invoice_status
+            
+            if status in other_sales_summary:
+                if order.currency_id == currency_usd_obj:
+                    other_sales_summary[status]['total_usd'] += order.amount_total
+                    other_sales_summary[status]['total_bs'] += order.amount_total * tasa_orden
+                else:
+                    other_sales_summary[status]['total_bs'] += order.amount_total
+                    other_sales_summary[status]['total_usd'] += (order.amount_total / tasa_orden) if tasa_orden else 0.0
+
+        # Filtramos para enviar a la vista solo los estados que tengan montos mayores a 0
+        formatted_other_sales = [v for v in other_sales_summary.values() if v['total_bs'] > 0 or v['total_usd'] > 0]
+
         # Format products list WITH subtotals
         formatted_pos_products = []
         for categ, prods in pos_products_data.items():
@@ -231,4 +258,5 @@ class ReportGlobalSalesDetails(models.AbstractModel):
             'total_sale_usd': total_sale_usd,
             'total_general_bs': total_pos_bs + total_sale_bs,
             'total_general_usd': total_pos_usd + total_sale_usd,
+            'other_sales': formatted_other_sales, 
         }
